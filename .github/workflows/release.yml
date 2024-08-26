@@ -1,0 +1,30 @@
+name: Release Gem
+on:
+  # Triggers the workflow on push with a tag prefixed with v*
+  push:
+    tags:
+      - 'v*'
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.3.4
+          bundler-cache: true
+      - name: Publish gem
+        env:
+          GITHUB_TOKEN: "${{secrets.GITHUB_TOKEN}}"
+          REPO_OWNER: "${{github.repository_owner}}"
+        run: |
+          mkdir -p $HOME/.gem
+          touch $HOME/.gem/credentials
+          chmod 0600 $HOME/.gem/credentials
+          printf -- "---\n:github: Bearer ${GITHUB_TOKEN}\n" > $HOME/.gem/credentials
+          gem build *.gemspec
+          gem push *.gem --key github --host https://rubygems.pkg.github.com/${REPO_OWNER}
