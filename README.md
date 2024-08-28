@@ -1,6 +1,7 @@
 # Spectre
 
-**Spectre** is a Ruby gem designed to provide an abstraction layer for generating embeddings using OpenAI's API. This gem simplifies the process of embedding data fields within your Rails models.
+**Spectre** is a Ruby gem designed to provide an abstraction layer for generating embeddings using OpenAI's API... 
+This gem simplifies the process of embedding data fields within your Rails models.
 
 ## Installation
 
@@ -73,6 +74,20 @@ Model.embed_all!(
 )
 ```
 This method will generate embeddings for all records that match the given scope and validation criteria. The method will also print the number of successful and failed embeddings to the console.
+
+**Directly Generate Embeddings Using Spectre::Openai::Embeddings.generate**
+
+If you need to generate an embedding directly without using the model integration, you can use the Spectre::Openai::Embeddings.generate method. This can be useful if you want to generate embeddings for custom text outside of your models:
+
+```ruby
+Spectre::Openai::Embeddings.generate("Your text here")
+```
+
+This method sends the text to OpenAI’s API and returns the embedding vector. You can optionally specify a different model by passing it as an argument:
+
+```ruby
+Spectre::Openai::Embeddings.generate("Your text here", model: "text-embedding-3-large")
+```
 
 ## Contributing
 Bug reports and pull requests are welcome on GitHub at https://github.com/hiremav/spectre. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the code of conduct.
