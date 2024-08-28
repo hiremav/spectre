@@ -4,7 +4,6 @@ require "spectre/version"
 require "spectre/embeddable"
 require "spectre/openai"
 require "spectre/logging"
-require "generators/spectre/initializer/initializer_generator"
 
 module Spectre
   def self.included(base)

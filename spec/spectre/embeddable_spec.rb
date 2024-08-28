@@ -51,7 +51,7 @@ RSpec.describe Spectre::Embeddable do
         model = TestModel.new(field1: 'value1', field2: 'value2')
 
         expect {
-          model.embed!(validation: -> { false })
+          model.embed!(validation: ->(model) { false })
         }.to raise_error(Spectre::Embeddable::EmbeddingValidationError, 'Validation failed for embedding')
       end
     end
