@@ -6,4 +6,5 @@ gemspec
 
 group :development, :test do
   gem 'rspec-rails'
+  gem 'webmock'
 end
