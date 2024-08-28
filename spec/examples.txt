@@ -1,0 +1,13 @@
+example_id                                 | status | run_time        |
+------------------------------------------ | ------ | --------------- |
+./spec/spectre/embeddable_spec.rb[1:1:1:1] | passed | 0.00017 seconds |
+./spec/spectre/embeddable_spec.rb[1:1:2:1] | passed | 0.0001 seconds  |
+./spec/spectre/embeddable_spec.rb[1:2:1:1] | passed | 0.00301 seconds |
+./spec/spectre/embeddable_spec.rb[1:2:2:1] | passed | 0.00044 seconds |
+./spec/spectre/embeddable_spec.rb[1:3:1]   | passed | 0.00003 seconds |
+./spec/spectre/embeddable_spec.rb[1:4:1:1] | passed | 0.00012 seconds |
+./spec/spectre/embeddable_spec.rb[1:4:2:1] | passed | 0.00024 seconds |
+./spec/spectre_spec.rb[1:1:1]              | passed | 0.00023 seconds |
+./spec/spectre_spec.rb[1:1:2]              | passed | 0.00043 seconds |
+./spec/spectre_spec.rb[1:2:1]              | passed | 0.00003 seconds |
+./spec/spectre_spec.rb[1:3:1]              | passed | 0.00027 seconds |

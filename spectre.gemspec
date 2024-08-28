@@ -14,5 +14,7 @@ Gem::Specification.new do |s|
 
   s.files = Dir.glob("lib/**/*") + %w[README.md CHANGELOG.md]
   s.require_paths = ["lib"]
+  # Development dependencies
+  s.add_development_dependency 'rspec-rails'
   s.required_ruby_version = ">= 3"
 end

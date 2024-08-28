@@ -14,8 +14,10 @@ jobs:
           ruby-version: 3.3.4
           bundler-cache: true
 
-      # Uncomment and use the following steps for running tests
-      # - name: Build and test with rspec
-      #   env:
-      #     RUBYOPT: -W:no-deprecated
-      #   run: bundle exec rspec spec
+      - name: Install dependencies
+        run: bundle install
+
+      - name: Build and test with rspec
+        env:
+          RUBYOPT: -W:no-deprecated
+        run: bundle exec rspec spec
