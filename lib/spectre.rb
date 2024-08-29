@@ -2,6 +2,7 @@
 
 require "spectre/version"
 require "spectre/embeddable"
+require 'spectre/searchable'
 require "spectre/openai"
 require "spectre/logging"
 
@@ -22,6 +23,8 @@ module Spectre
         case mod
         when :embeddable
           include Spectre::Embeddable
+        when :searchable
+          include Spectre::Searchable
         else
           raise ArgumentError, "Unknown spectre module: #{mod}"
         end
