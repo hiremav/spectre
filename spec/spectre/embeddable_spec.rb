@@ -8,7 +8,9 @@ RSpec.describe Spectre::Embeddable do
   before do
     TestModel.clear_all
     TestModel.embeddable_field :field1, :field2
-    allow(Spectre).to receive(:llm_provider).and_return(:openai)
+    Spectre.setup do |config|
+      config.llm_provider = :openai
+    end
   end
 
   describe '#as_vector' do
