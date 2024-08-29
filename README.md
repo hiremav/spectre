@@ -1,7 +1,6 @@
 # Spectre
 
-**Spectre** is a Ruby gem designed to provide an abstraction layer for generating embeddings using OpenAI's API... 
-This gem simplifies the process of embedding data fields within your Rails models.
+**Spectre** is a Ruby gem designed to provide an abstraction layer for generating embeddings using OpenAI's API and for performing vector-based searches. This gem simplifies the process of embedding data fields and searching within your Rails models.
 
 ## Installation
 
@@ -30,9 +29,12 @@ This will create a file at config/initializers/spectre.rb, where you can set you
 ```ruby
 Spectre.setup do |config|
   config.api_key = 'your_openai_api_key'
+  config.llm_provider = :openai # Options: :openai
 end
 ```
 ### 2. Integrate Spectre with Your Model
+
+**2.1. Embeddable Module**
 
 To use Spectre for generating embeddings in your Rails model, follow these steps:
 
@@ -53,6 +55,35 @@ class Model
   embeddable_field :message, :response, :category
 end
 ```
+
+**2.2. Searchable Module**
+
+To enable vector-based search in your Rails model:
+
+1.	Include the Spectre module:
+Include Spectre in your model to enable the spectre method.
+2.	Declare the Model as Searchable:
+Use the spectre :searchable declaration to make the model searchable.
+3.	Configure Search Parameters:
+Use the following methods to configure the search path, index, and result fields:
+•	configure_spectre_search_path: Set the path where the embeddings are stored.
+•	configure_spectre_search_index: Set the index used for the vector search.
+•	configure_spectre_result_fields: Set the fields to include in the search results.
+
+Here is an example of how to set this up in a model:
+
+```ruby
+class Model
+  include Mongoid::Document
+  include Spectre
+
+  spectre :searchable
+  configure_spectre_search_path 'embedding'
+  configure_spectre_search_index 'vector_index'
+  configure_spectre_result_fields({ "message": 1, "response": 1 })
+end
+```
+
 ### 3. Generating Embeddings
 
 **Generate Embedding for a Single Record**
@@ -75,19 +106,43 @@ Model.embed_all!(
 ```
 This method will generate embeddings for all records that match the given scope and validation criteria. The method will also print the number of successful and failed embeddings to the console.
 
-**Directly Generate Embeddings Using Spectre::Openai::Embeddings.generate**
+**Directly Generate Embeddings Using Spectre.provider_module::Embeddings.generate**
 
 If you need to generate an embedding directly without using the model integration, you can use the Spectre::Openai::Embeddings.generate method. This can be useful if you want to generate embeddings for custom text outside of your models:
 
 ```ruby
-Spectre::Openai::Embeddings.generate("Your text here")
+Spectre.provider_module::Embeddings.generate("Your text here")
 ```
 
 This method sends the text to OpenAI’s API and returns the embedding vector. You can optionally specify a different model by passing it as an argument:
 
 ```ruby
-Spectre::Openai::Embeddings.generate("Your text here", model: "text-embedding-3-large")
+Spectre.provider_module::Embeddings.generate("Your text here", model: "text-embedding-3-large")
 ```
+
+### 4. Performing Vector-Based Searches
+
+Once your model is configured as searchable, you can perform vector-based searches on the stored embeddings:
+
+```ruby
+Model.search('Your search query', custom_result_fields: { "response" => 1 }, additional_scopes: [{ "$match": { "category": "science" } }])
+```
+
+This method will:
+
+•	Embed the search query using the configured LLM provider.
+
+•	Perform a vector-based search on the embeddings stored in the specified search_path.
+
+•	Return the matching records with the specified result_fields and their vectorSearchScore.
+
+**Examples:**
+
+•	**Custom Result Fields**: Limit the fields returned in the search results.
+
+•	**Additional Scopes**: Apply additional MongoDB filters to the search results.
+
+
 
 ## Contributing
 Bug reports and pull requests are welcome on GitHub at https://github.com/hiremav/spectre. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the code of conduct.
