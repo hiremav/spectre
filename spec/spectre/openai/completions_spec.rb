@@ -6,6 +6,7 @@ RSpec.describe Spectre::Openai::Completions do
   let(:api_key) { 'test_api_key' }
   let(:user_prompt) { 'Tell me a joke.' }
   let(:system_prompt) { 'You are a funny assistant.' }
+  let(:assistant_prompt) { 'Sure, here\'s a joke!' }
   let(:completion) { 'Why did the chicken cross the road? To get to the other side!' }
   let(:response_body) { { choices: [{ message: { content: completion } }] }.to_json }
 
@@ -21,7 +22,7 @@ RSpec.describe Spectre::Openai::Completions do
 
       it 'raises an APIKeyNotConfiguredError' do
         expect {
-          described_class.generate(user_prompt, system_prompt: system_prompt)
+          described_class.generate(user_prompt: user_prompt, system_prompt: system_prompt)
         }.to raise_error(Spectre::APIKeyNotConfiguredError, 'API key is not configured')
       end
     end
@@ -33,7 +34,7 @@ RSpec.describe Spectre::Openai::Completions do
       end
 
       it 'returns the completion text' do
-        result = described_class.generate(user_prompt, system_prompt: system_prompt)
+        result = described_class.generate(user_prompt: user_prompt, system_prompt: system_prompt, assistant_prompt: assistant_prompt)
         expect(result).to eq(completion)
       end
     end
@@ -46,7 +47,7 @@ RSpec.describe Spectre::Openai::Completions do
 
       it 'raises an error with the API response' do
         expect {
-          described_class.generate(user_prompt, system_prompt: system_prompt)
+          described_class.generate(user_prompt: user_prompt, system_prompt: system_prompt)
         }.to raise_error(RuntimeError, /OpenAI API Error/)
       end
     end
@@ -59,7 +60,7 @@ RSpec.describe Spectre::Openai::Completions do
 
       it 'raises a JSON Parse Error' do
         expect {
-          described_class.generate(user_prompt, system_prompt: system_prompt)
+          described_class.generate(user_prompt: user_prompt, system_prompt: system_prompt)
         }.to raise_error(RuntimeError, /JSON Parse Error/)
       end
     end
@@ -72,7 +73,7 @@ RSpec.describe Spectre::Openai::Completions do
 
       it 'raises a Request Timeout error' do
         expect {
-          described_class.generate(user_prompt, system_prompt: system_prompt)
+          described_class.generate(user_prompt: user_prompt, system_prompt: system_prompt)
         }.to raise_error(RuntimeError, /Request Timeout/)
       end
     end

@@ -14,11 +14,12 @@ module Spectre
       #
       # @param user_prompt [String] the user's input to generate a completion for
       # @param system_prompt [String] an optional system prompt to guide the AI's behavior
+      # @param assistant_prompt [String] an optional assistant prompt to provide context for the assistant's behavior
       # @param model [String] the model to be used for generating completions, defaults to DEFAULT_MODEL
       # @return [String] the generated completion text
       # @raise [APIKeyNotConfiguredError] if the API key is not set
       # @raise [RuntimeError] for general API errors or unexpected issues
-      def self.generate(user_prompt, system_prompt: "You are a helpful assistant.", model: DEFAULT_MODEL)
+      def self.generate(user_prompt:, system_prompt: "You are a helpful assistant.", assistant_prompt: nil, model: DEFAULT_MODEL)
         api_key = Spectre.api_key
         raise APIKeyNotConfiguredError, "API key is not configured" unless api_key
 
@@ -33,7 +34,7 @@ module Spectre
           'Authorization' => "Bearer #{api_key}"
         })
 
-        request.body = generate_body(user_prompt, system_prompt, model).to_json
+        request.body = generate_body(user_prompt, system_prompt, assistant_prompt, model).to_json
         response = http.request(request)
 
         unless response.is_a?(Net::HTTPSuccess)
@@ -53,15 +54,21 @@ module Spectre
       #
       # @param user_prompt [String] the user's input to generate a completion for
       # @param system_prompt [String] an optional system prompt to guide the AI's behavior
+      # @param assistant_prompt [String] an optional assistant prompt to provide context for the assistant's behavior
       # @param model [String] the model to be used for generating completions
       # @return [Hash] the body for the API request
-      def self.generate_body(user_prompt, system_prompt, model)
+      def self.generate_body(user_prompt, system_prompt, assistant_prompt, model)
+        messages = [
+          { role: 'system', content: system_prompt },
+          { role: 'user', content: user_prompt }
+        ]
+
+        # Add the assistant prompt if provided
+        messages << { role: 'assistant', content: assistant_prompt } if assistant_prompt
+
         {
           model: model,
-          messages: [
-            { role: 'system', content: system_prompt },
-            { role: 'user', content: user_prompt }
-          ]
+          messages: messages
         }
       end
     end
