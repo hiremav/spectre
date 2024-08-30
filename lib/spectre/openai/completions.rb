@@ -7,7 +7,7 @@ require 'uri'
 module Spectre
   module Openai
     class Completions
-      API_URL = 'https://api.openai.com/v1/completions'
+      API_URL = 'https://api.openai.com/v1/chat/completions'
       DEFAULT_MODEL = 'gpt-4o-mini'
 
       # Class method to generate a completion based on a user prompt
