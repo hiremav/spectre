@@ -23,7 +23,7 @@ RSpec.describe Spectre::Searchable do
   describe '.search' do
     context 'with default configuration' do
       it 'returns matching records with vectorSearchScore' do
-        results = TestModel.search('AI')
+        results = TestModel.vector_search('AI')
         expect(results).to be_an(Array)
         expect(results.size).to be > 0
         expect(results.first.keys).to include('field1', 'field2', 'score')
@@ -37,7 +37,7 @@ RSpec.describe Spectre::Searchable do
                                                                         { 'field2' => 'Artificial Intelligence', 'score' => 0.99 }
                                                                       ])
 
-        results = TestModel.search('AI', custom_result_fields: custom_fields)
+        results = TestModel.vector_search('AI', custom_result_fields: custom_fields)
         expect(results.first.keys).to include('field2', 'score')
         expect(results.first.keys).not_to include('field1')
       end
@@ -50,7 +50,7 @@ RSpec.describe Spectre::Searchable do
                                                                         { 'field1' => 'Machine Learning', 'field2' => 'AI in ML', 'score' => 0.95 }
                                                                       ])
 
-        results = TestModel.search('AI', additional_scopes: additional_scopes)
+        results = TestModel.vector_search('AI', additional_scopes: additional_scopes)
         expect(results.size).to eq(1)
         expect(results.first['field1']).to eq('Machine Learning')
       end

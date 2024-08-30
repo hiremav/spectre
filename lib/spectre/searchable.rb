@@ -59,31 +59,31 @@ module Spectre
       # @return [Array<Hash>] The search results, including the configured fields and score.
       #
       # @example Basic search with configured result fields
-      #   results = CognitiveResponse.search("What is AI?")
+      #   results = Model.vector_search("What is AI?")
       #
       # @example Search with custom result fields
-      #   results = CognitiveResponse.search(
+      #   results = Model.vector_search(
       #     "What is AI?",
       #     limit: 10,
       #     custom_result_fields: { "some_additional_field": 1, "another_field": 1 }
       #   )
       #
       # @example Search with additional filtering using scopes
-      #   results = CognitiveResponse.search(
+      #   results = Model.vector_search(
       #     "What is AI?",
       #     limit: 10,
       #     additional_scopes: [{ "$match": { "some_field": "some_value" } }]
       #   )
       #
       # @example Combining custom result fields and additional scopes
-      #   results = CognitiveResponse.search(
+      #   results = Model.vector_search(
       #     "What is AI?",
       #     limit: 10,
       #     additional_scopes: [{ "$match": { "some_field": "some_value" } }],
       #     custom_result_fields: { "some_additional_field": 1, "another_field": 1 }
       #   )
       #
-      def search(query, limit: 5, additional_scopes: [], custom_result_fields: nil)
+      def vector_search(query, limit: 5, additional_scopes: [], custom_result_fields: nil)
         # Generate the embedding for the query string
         embedded_query = Spectre.provider_module::Embeddings.generate(query)
 
