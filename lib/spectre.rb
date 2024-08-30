@@ -7,6 +7,8 @@ require "spectre/openai"
 require "spectre/logging"
 
 module Spectre
+  class APIKeyNotConfiguredError < StandardError; end
+
   VALID_LLM_PROVIDERS = {
     openai: Spectre::Openai,
     # cohere: Spectre::Cohere,

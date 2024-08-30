@@ -6,8 +6,6 @@ require 'uri'
 
 module Spectre
   module Openai
-    class APIKeyNotConfiguredError < StandardError; end
-
     class Embeddings
       API_URL = 'https://api.openai.com/v1/embeddings'
       DEFAULT_MODEL = 'text-embedding-3-small'

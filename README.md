@@ -142,7 +142,30 @@ This method will:
 
 •	**Additional Scopes**: Apply additional MongoDB filters to the search results.
 
+### 5. Generating Completions
 
+Spectre also provides an interface to generate text completions using the LLM provider. This can be useful for generating responses, messages, or other forms of text.
+
+**Generate a Completion**
+
+To generate a text completion, use the Spectre.provider_module::Completions.generate method:
+    
+```ruby
+Spectre.provider_module::Completions.generate(
+  user_prompt: "Tell me a joke.",
+  system_prompt: "You are a funny assistant."
+)
+```
+
+This method sends the prompts to the LLM provider’s API and returns the generated completion. You can optionally specify a different model by passing it as an argument:
+
+```ruby
+Spectre.provider_module::Completions.generate(
+  user_prompt: "Tell me a joke.",
+  system_prompt: "You are a funny assistant.",
+  model: "gpt-4-turbo"
+)
+```
 
 ## Contributing
 Bug reports and pull requests are welcome on GitHub at https://github.com/hiremav/spectre. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the code of conduct.
