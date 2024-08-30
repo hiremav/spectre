@@ -157,13 +157,14 @@ Spectre.provider_module::Completions.generate(
 )
 ```
 
-This method sends the prompts to the LLM provider’s API and returns the generated completion. You can optionally specify a different model by passing it as an argument:
+This method sends the prompts to the LLM provider’s API and returns the generated completion. You can optionally specify a different model by passing it as an argument and set assistant_prompt:
 
 ```ruby
 Spectre.provider_module::Completions.generate(
   user_prompt: "Tell me a joke.",
   system_prompt: "You are a funny assistant.",
-  model: "gpt-4-turbo"
+  model: "gpt-4-turbo",
+  assistant_prompt: "Assistant prompt here."
 )
 ```
 
