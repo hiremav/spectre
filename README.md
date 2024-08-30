@@ -1,6 +1,6 @@
 # Spectre
 
-**Spectre** is a Ruby gem designed to provide an abstraction layer for generating embeddings using OpenAI's API and for performing vector-based searches. This gem simplifies the process of embedding data fields and searching within your Rails models.
+**Spectre** is a Ruby gem designed to make it easy to perform vector-based searches, generate embeddings and execute dynamic LLM prompts (Like RAG).
 
 ## Installation
 
