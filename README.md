@@ -125,7 +125,7 @@ Spectre.provider_module::Embeddings.generate("Your text here", model: "text-embe
 Once your model is configured as searchable, you can perform vector-based searches on the stored embeddings:
 
 ```ruby
-Model.search('Your search query', custom_result_fields: { "response" => 1 }, additional_scopes: [{ "$match": { "category": "science" } }])
+Model.vector_search('Your search query', custom_result_fields: { "response" => 1 }, additional_scopes: [{ "$match": { "category": "science" } }])
 ```
 
 This method will:
