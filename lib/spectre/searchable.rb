@@ -3,7 +3,7 @@
 module Spectre
   module Searchable
     def self.included(base)
-      unless base.ancestors.include?(Mongoid::Document)
+      unless base.ancestors.map(&:to_s).include?('Mongoid::Document')
         raise "Spectre::Searchable can only be included in Mongoid models. The class #{base.name} does not appear to be a Mongoid model."
       end
 

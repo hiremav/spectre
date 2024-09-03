@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
 require 'spectre'
+require_relative 'mongoid/document'
 
 class TestModel
   include Spectre
+  include Mongoid::Document
 
   spectre :embeddable, :searchable
 
