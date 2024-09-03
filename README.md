@@ -56,7 +56,9 @@ class Model
 end
 ```
 
-**2.2. Searchable Module**
+**2.2. Searchable Module (MongoDB Only)**
+
+**Note:** The `Searchable` module is designed to work exclusively with Mongoid models. If you attempt to include it in a non-Mongoid model, an error will be raised. This ensures that vector-based searches, which rely on MongoDB's specific features, are only used in appropriate contexts.
 
 To enable vector-based search in your Rails model:
 
