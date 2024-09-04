@@ -5,6 +5,7 @@ require "spectre/embeddable"
 require 'spectre/searchable'
 require "spectre/openai"
 require "spectre/logging"
+require 'spectre/prompt'
 
 module Spectre
   class APIKeyNotConfiguredError < StandardError; end

@@ -2,6 +2,7 @@
 
 require 'spectre'
 require 'webmock/rspec'
+require 'pry'
 
 RSpec.configure do |config|
   WebMock.disable_net_connect!(allow_localhost: true)
@@ -21,4 +22,8 @@ RSpec.configure do |config|
   config.default_formatter = "progress" if config.files_to_run.one?
   config.order = :random
   Kernel.srand config.seed
+
+  config.before(:suite) do
+    require 'pry'
+  end
 end

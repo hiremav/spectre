@@ -170,6 +170,73 @@ Spectre.provider_module::Completions.generate(
 )
 ```
 
+### 6. Generating Dynamic Prompts
+
+Spectre provides a system for generating dynamic prompts based on templates. You can define reusable prompt templates and generate them with different inputs in your Rails app.
+
+**Example Directory Structure for Prompts**
+
+Create a folder structure in your app to hold the prompt templates:
+
+```
+app/spectre/prompts/
+└── rag/
+    ├── system_prompt.yml.erb
+    └── user_prompt.yml.erb
+```
+
+Each .yml.erb file can contain dynamic content and be customized with embedded Ruby (ERB).
+
+**Example Prompt Templates**
+
+•	system_prompt.yml.erb:
+```yaml
+system: |
+  You are a helpful assistant designed to provide answers based on specific documents and context provided to you.
+  Follow these guidelines:
+  1. Only provide answers based on the context provided.
+  2. Be polite and concise.
+```
+
+•	user_prompt.yml.erb:
+```yaml
+user: |
+  User's query: <%= @query %>
+  Context: <%= @objects.join(", ") %>
+```
+
+**Generating Prompts in Your Code**
+
+You can generate prompts in your Rails application using the Spectre::Prompt.generate method, which loads and renders the specified prompt template:
+
+```ruby
+# Generate a system prompt
+Spectre::Prompt.generate(name: 'rag', prompt: :system)
+
+# Generate a user prompt with local variables
+Spectre::Prompt.generate(
+  name: 'rag',
+  prompt: :user,
+  locals: {
+    query: query,
+    objects: objects
+  }
+)
+```
+
+•	name: The name of the folder where the prompt files are stored (e.g., rag).
+•	prompt: The name of the specific prompt file (e.g., system or user).
+•	locals: A hash of variables to be used inside the ERB template.
+
+**Generating Example Prompt Files**
+
+You can use a Rails generator to create example prompt files in your project. Run the following command:
+
+```bash
+rails generate spectre:install
+```
+
+
 ## Contributing
 Bug reports and pull requests are welcome on GitHub at https://github.com/hiremav/spectre. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the code of conduct.
 
