@@ -211,11 +211,11 @@ You can generate prompts in your Rails application using the Spectre::Prompt.gen
 
 ```ruby
 # Generate a system prompt
-Spectre::Prompt.generate(name: 'rag', prompt: :system)
+Spectre::Prompt.generate(type: 'rag', prompt: :system)
 
 # Generate a user prompt with local variables
 Spectre::Prompt.generate(
-  name: 'rag',
+  type: 'rag',
   prompt: :user,
   locals: {
     query: query,

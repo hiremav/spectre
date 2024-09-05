@@ -9,13 +9,13 @@ module Spectre
 
     # Generate a prompt by reading and rendering the YAML template
     #
-    # @param name [String] Name of the folder containing the prompts (e.g., 'rag')
+    # @param type [String] Name of the folder containing the prompts (e.g., 'rag')
     # @param prompt [Symbol] The type of prompt (e.g., :system or :user)
     # @param locals [Hash] Variables to be passed to the template for rendering
     #
     # @return [String] Rendered prompt
-    def self.generate(name:, prompt:, locals: {})
-      file_path = prompt_file_path(name, prompt)
+    def self.generate(type:, prompt:, locals: {})
+      file_path = prompt_file_path(type, prompt)
 
       raise "Prompt file not found: #{file_path}" unless File.exist?(file_path)
 
@@ -32,12 +32,12 @@ module Spectre
 
     # Build the path to the desired prompt file
     #
-    # @param name [String] Name of the prompt folder
+    # @param type [String] Name of the prompt folder
     # @param prompt [Symbol] Type of prompt (e.g., :system, :user)
     #
     # @return [String] Full path to the template file
-    def self.prompt_file_path(name, prompt)
-      "#{PROMPTS_PATH}/#{name}/#{prompt}_prompt.yml.erb"
+    def self.prompt_file_path(type, prompt)
+      "#{PROMPTS_PATH}/#{type}/#{prompt}_prompt.yml.erb"
     end
 
     # Helper class to handle the binding for ERB rendering

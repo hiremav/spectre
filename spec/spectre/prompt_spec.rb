@@ -16,7 +16,7 @@ RSpec.describe Spectre::Prompt do
     <<~ERB
       user: |
         User's query: <%= @query %>
-        Context: <%= @cognitive_responses_in_context.join(", ") %>
+        Context: <%= @objects.join(", ") %>
     ERB
   end
 
@@ -44,7 +44,7 @@ RSpec.describe Spectre::Prompt do
   describe '.generate' do
     context 'when generating the system prompt' do
       it 'returns the rendered system prompt' do
-        result = described_class.generate(name: 'rag', prompt: :system)
+        result = described_class.generate(type: 'rag', prompt: :system)
 
         expect(result).to eq("You are a helpful assistant.\n")
       end
@@ -52,13 +52,13 @@ RSpec.describe Spectre::Prompt do
 
     context 'when generating the user prompt with locals' do
       let(:query) { 'What is AI?' }
-      let(:cognitive_responses_in_context) { ['AI is cool', 'AI is the future'] }
+      let(:objects) { ['AI is cool', 'AI is the future'] }
 
       it 'returns the rendered user prompt with local variables' do
         result = described_class.generate(
-          name: 'rag',
+          type: 'rag',
           prompt: :user,
-          locals: { query: query, cognitive_responses_in_context: cognitive_responses_in_context }
+          locals: { query: query, objects: objects }
         )
         expected_result = "User's query: What is AI?\nContext: AI is cool, AI is the future\n"
         expect(result).to eq(expected_result)
