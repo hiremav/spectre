@@ -146,11 +146,11 @@ This method will:
 
 ### 5. Generating Completions
 
-Spectre also provides an interface to generate text completions using the LLM provider. This can be useful for generating responses, messages, or other forms of text.
+Spectre provides an interface to generate text completions using your configured LLM provider, allowing you to generate dynamic responses, messages, or other forms of text.
 
-**Generate a Completion**
+**Basic Completion Example**
 
-To generate a text completion, use the Spectre.provider_module::Completions.generate method:
+To generate a simple text completion, use the Spectre.provider_module::Completions.generate method. You can provide a user prompt and an optional system prompt to guide the response:
     
 ```ruby
 Spectre.provider_module::Completions.generate(
@@ -159,16 +159,46 @@ Spectre.provider_module::Completions.generate(
 )
 ```
 
-This method sends the prompts to the LLM provider’s API and returns the generated completion. You can optionally specify a different model by passing it as an argument and set assistant_prompt:
+This sends the request to the LLM provider’s API and returns the generated completion.
+
+**Customizing the Completion**
+
+You can customize the behavior by specifying additional parameters such as the model or an assistant_prompt to provide further context for the AI’s responses:
 
 ```ruby
 Spectre.provider_module::Completions.generate(
   user_prompt: "Tell me a joke.",
   system_prompt: "You are a funny assistant.",
-  model: "gpt-4-turbo",
-  assistant_prompt: "Assistant prompt here."
+  assistant_prompt: "Sure, here's a joke!",
+  model: "gpt-4-turbo"
 )
 ```
+
+**Using a JSON Schema for Structured Output**
+
+For cases where you need structured output (e.g., for returning specific fields or formatted responses), you can pass a json_schema parameter. The schema ensures that the completion conforms to a predefined structure:
+
+```ruby
+json_schema = {
+  name: "completion_response",
+  schema: {
+    type: "object",
+    properties: {
+      response: { type: "string" },
+      final_answer: { type: "string" }
+    },
+    required: ["response", "final_answer"],
+    additionalProperties: false
+  }
+}
+
+Spectre.provider_module::Completions.generate(
+  user_prompt: "What is the capital of France?",
+  system_prompt: "You are a knowledgeable assistant.",
+  json_schema: json_schema
+)
+```
+This structured format guarantees that the response adheres to the schema you’ve provided, ensuring more predictable and controlled results.
 
 ### 6. Generating Dynamic Prompts
 
