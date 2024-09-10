@@ -1,6 +1,18 @@
 # Spectre
 
-**Spectre** is a Ruby gem designed to make it easy to perform vector-based searches, generate embeddings and execute dynamic LLM prompts (Like RAG).
+**Spectre** is a Ruby gem that makes it easy to AI-enable your Ruby on Rails application. Currently, Spectre focuses on helping developers perform vector-based searches, generate embeddings, and manage multiple dynamic prompts — ideal for applications that require RAG (Retrieval-Augmented Generation) and dynamic prompts.
+
+## Compatibility
+
+| Feature                | Compatibility |
+|------------------------|---------------|
+| Foundation Model (LLM) | OpenAI        |
+| Embeddings             | OpenAI        |
+| Vector Searching       | MongoDB Atlas |
+| Prompt Files           | OpenAI        |
+
+
+**💡 Note:** We'll first be prioritizing additional foundation models (Claude, Cohere, LLaMA, etc), then looking to add additional support for more vector database (Pgvector, Pinecone, etc). If you're looking for something a bit more extendable we highly recommend checking out [langchainrb](https://github.com/patterns-ai-core/langchainrb).
 
 ## Installation
 
@@ -13,7 +25,9 @@ And then execute:
 ```bash
 bundle install
 ```
+
 Or install it yourself as:
+
 ```bash
 gem install spectre
 ```
@@ -29,21 +43,18 @@ This will create a file at config/initializers/spectre.rb, where you can set you
 ```ruby
 Spectre.setup do |config|
   config.api_key = 'your_openai_api_key'
-  config.llm_provider = :openai # Options: :openai
+  config.llm_provider = :openai
 end
 ```
-### 2. Integrate Spectre with Your Model
+### 2. Integrate Spectre with Your Rails Model
 
 **2.1. Embeddable Module**
 
 To use Spectre for generating embeddings in your Rails model, follow these steps:
 
-1.	Include the Spectre module:
-Include Spectre in your model to enable the spectre method.
-2.	Declare the Model as Embeddable:
-Use the spectre :embeddable declaration to make the model embeddable.
-3.	Define the Embeddable Fields:
-Use the embeddable_field method to specify which fields should be used to generate the embeddings.
+1.	Include the Spectre module.
+2.	Declare the Model as embeddable.
+3.	Define the embeddable fields.
 
 Here is an example of how to set this up in a model:
 ```ruby
@@ -62,15 +73,14 @@ end
 
 To enable vector-based search in your Rails model:
 
-1.	Include the Spectre module:
-Include Spectre in your model to enable the spectre method.
-2.	Declare the Model as Searchable:
-Use the spectre :searchable declaration to make the model searchable.
-3.	Configure Search Parameters:
+1.	Include the Spectre module.
+2.	Declare the Model as Searchable.
+3.	Configure search paramaters.
+
 Use the following methods to configure the search path, index, and result fields:
-•	configure_spectre_search_path: Set the path where the embeddings are stored.
-•	configure_spectre_search_index: Set the index used for the vector search.
-•	configure_spectre_result_fields: Set the fields to include in the search results.
+- **configure_spectre_search_path:** The path where the embeddings are stored.
+- **configure_spectre_search_index:** The index used for the vector search.
+- **configure_spectre_result_fields:** The fields to include in the search results.
 
 Here is an example of how to set this up in a model:
 
@@ -90,7 +100,7 @@ end
 
 **Generate Embedding for a Single Record**
 
-To generate an embedding for a single record, you can call the embed! method on the instance:
+To generate an embedding for a single record, you can call the embed! method on the instance record:
 ```ruby
 record = Model.find(some_id)
 record.embed!
@@ -110,10 +120,10 @@ This method will generate embeddings for all records that match the given scope 
 
 **Directly Generate Embeddings Using Spectre.provider_module::Embeddings.generate**
 
-If you need to generate an embedding directly without using the model integration, you can use the Spectre::Openai::Embeddings.generate method. This can be useful if you want to generate embeddings for custom text outside of your models:
+If you need to generate an embedding directly without using the model integration, you can use the `Spectre.provider_module::Embeddings.generate` method. This can be useful if you want to generate embeddings for custom text outside of your models. For example, with OpenAI:
 
 ```ruby
-Spectre.provider_module::Embeddings.generate("Your text here")
+Spectre::provider_module::Embeddings.generate("Your text here")
 ```
 
 This method sends the text to OpenAI’s API and returns the embedding vector. You can optionally specify a different model by passing it as an argument:
@@ -268,5 +278,15 @@ rails generate spectre:install
 
 
 ## Contributing
-Bug reports and pull requests are welcome on GitHub at https://github.com/hiremav/spectre. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the code of conduct.
 
+Bug reports and pull requests are welcome on GitHub at https://github.com/hiremav/spectre. This project is intended to be a safe, welcoming space for collaboration, and your contributions are greatly appreciated!
+
+	1.	Fork the repository.
+	2.	Create a new feature branch (git checkout -b my-new-feature).
+	3.	Commit your changes (git commit -am 'Add some feature').
+	4.	Push the branch (git push origin my-new-feature).
+	5.	Create a pull request.
+
+## License
+
+This gem is available as open source under the terms of the MIT License.
