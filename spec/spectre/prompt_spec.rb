@@ -44,7 +44,7 @@ RSpec.describe Spectre::Prompt do
   describe '.generate' do
     context 'when generating the system prompt' do
       it 'returns the rendered system prompt' do
-        result = described_class.generate(type: 'rag', prompt: :system)
+        result = described_class.render(type: 'rag', prompt: :system)
 
         expect(result).to eq("You are a helpful assistant.\n")
       end
@@ -55,7 +55,7 @@ RSpec.describe Spectre::Prompt do
       let(:objects) { ['AI is cool', 'AI is the future'] }
 
       it 'returns the rendered user prompt with local variables' do
-        result = described_class.generate(
+        result = described_class.render(
           type: 'rag',
           prompt: :user,
           locals: { query: query, objects: objects }

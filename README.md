@@ -240,11 +240,11 @@ user: |
 You can generate prompts in your Rails application using the Spectre::Prompt.generate method, which loads and renders the specified prompt template:
 
 ```ruby
-# Generate a system prompt
-Spectre::Prompt.generate(type: 'rag', prompt: :system)
+# Render a system prompt
+Spectre::Prompt.render(type: 'rag', prompt: :system)
 
 # Generate a user prompt with local variables
-Spectre::Prompt.generate(
+Spectre::Prompt.render(
   type: 'rag',
   prompt: :user,
   locals: {

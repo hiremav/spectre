@@ -7,14 +7,14 @@ module Spectre
   class Prompt
     PROMPTS_PATH = File.join(Dir.pwd, 'app', 'spectre', 'prompts')
 
-    # Generate a prompt by reading and rendering the YAML template
+    # Render a prompt by reading and rendering the YAML template
     #
     # @param type [String] Name of the folder containing the prompts (e.g., 'rag')
     # @param prompt [Symbol] The type of prompt (e.g., :system or :user)
     # @param locals [Hash] Variables to be passed to the template for rendering
     #
     # @return [String] Rendered prompt
-    def self.generate(type:, prompt:, locals: {})
+    def self.render(type:, prompt:, locals: {})
       file_path = prompt_file_path(type, prompt)
 
       raise "Prompt file not found: #{file_path}" unless File.exist?(file_path)
