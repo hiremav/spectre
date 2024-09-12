@@ -4,12 +4,12 @@
 
 ## Compatibility
 
-| Feature                | Compatibility |
-|------------------------|---------------|
-| Foundation Model (LLM) | OpenAI        |
-| Embeddings             | OpenAI        |
-| Vector Searching       | MongoDB Atlas |
-| Prompt Files           | OpenAI        |
+| Feature                 | Compatibility |
+|-------------------------|---------------|
+| Foundation Models (LLM) | OpenAI        |
+| Embeddings              | OpenAI        |
+| Vector Searching        | MongoDB Atlas |
+| Prompt Templates        | OpenAI        |
 
 
 **💡 Note:** We'll first be prioritizing additional foundation models (Claude, Cohere, LLaMA, etc), then looking to add additional support for more vector database (Pgvector, Pinecone, etc). If you're looking for something a bit more extendable we highly recommend checking out [langchainrb](https://github.com/patterns-ai-core/langchainrb).
@@ -212,7 +212,7 @@ This structured format guarantees that the response adheres to the schema you’
 
 ### 6. Generating Dynamic Prompts
 
-Spectre provides a system for generating dynamic prompts based on templates. You can define reusable prompt templates and generate them with different inputs in your Rails app.
+Spectre provides a system for generating dynamic prompts based on templates. You can define reusable prompt templates and generate them with different paramaters in your Rails app, _(like view partials)_.
 
 **Example Directory Structure for Prompts**
 
