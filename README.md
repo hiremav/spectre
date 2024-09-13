@@ -212,7 +212,7 @@ This structured format guarantees that the response adheres to the schema you’
 
 ### 6. Generating Dynamic Prompts
 
-Spectre provides a system for generating dynamic prompts based on templates. You can define reusable prompt templates and generate them with different paramaters in your Rails app, _(like view partials)_.
+Spectre provides a system for generating dynamic prompts based on templates. You can define reusable prompt templates and generate them with different parameters in your Rails app, _(like view partials)_.
 
 **Example Directory Structure for Prompts**
 
@@ -221,15 +221,15 @@ Create a folder structure in your app to hold the prompt templates:
 ```
 app/spectre/prompts/
 └── rag/
-    ├── system_prompt.yml.erb
-    └── user_prompt.yml.erb
+    ├── system.yml.erb
+    └── user.yml.erb
 ```
 
 Each .yml.erb file can contain dynamic content and be customized with embedded Ruby (ERB).
 
 **Example Prompt Templates**
 
-•	system_prompt.yml.erb:
+•	system.yml.erb:
 ```yaml
 system: |
   You are a helpful assistant designed to provide answers based on specific documents and context provided to you.
@@ -238,7 +238,7 @@ system: |
   2. Be polite and concise.
 ```
 
-•	user_prompt.yml.erb:
+•	user.yml.erb:
 ```yaml
 user: |
   User's query: <%= @query %>
@@ -251,12 +251,11 @@ You can generate prompts in your Rails application using the Spectre::Prompt.gen
 
 ```ruby
 # Render a system prompt
-Spectre::Prompt.render(type: 'rag', prompt: :system)
+Spectre::Prompt.render(template: 'rag/system')
 
 # Generate a user prompt with local variables
 Spectre::Prompt.render(
-  type: 'rag',
-  prompt: :user,
+  template: 'rag/user',
   locals: {
     query: query,
     objects: objects
@@ -264,8 +263,7 @@ Spectre::Prompt.render(
 )
 ```
 
-•	name: The name of the folder where the prompt files are stored (e.g., rag).
-•	prompt: The name of the specific prompt file (e.g., system or user).
+•	template: The path to the prompt template file (e.g., rag/system).
 •	locals: A hash of variables to be used inside the ERB template.
 
 **Generating Example Prompt Files**
@@ -275,7 +273,6 @@ You can use a Rails generator to create example prompt files in your project. Ru
 ```bash
 rails generate spectre:install
 ```
-
 
 ## Contributing
 

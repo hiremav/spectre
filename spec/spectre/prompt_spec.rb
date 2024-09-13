@@ -29,8 +29,8 @@ RSpec.describe Spectre::Prompt do
     FileUtils.mkdir_p(prompts_folder)
 
     # Write the mock system_prompt.yml.erb and user_prompt.yml.erb files
-    File.write(File.join(prompts_folder, 'system_prompt.yml.erb'), system_prompt_content)
-    File.write(File.join(prompts_folder, 'user_prompt.yml.erb'), user_prompt_content)
+    File.write(File.join(prompts_folder, 'system.yml.erb'), system_prompt_content)
+    File.write(File.join(prompts_folder, 'user.yml.erb'), user_prompt_content)
 
     # Temporarily set the PROMPTS_PATH to the tmp directory
     stub_const('Spectre::Prompt::PROMPTS_PATH', @tmpdir)
@@ -41,10 +41,10 @@ RSpec.describe Spectre::Prompt do
     FileUtils.remove_entry @tmpdir
   end
 
-  describe '.generate' do
+  describe '.render' do
     context 'when generating the system prompt' do
       it 'returns the rendered system prompt' do
-        result = described_class.render(type: 'rag', prompt: :system)
+        result = described_class.render(template: 'rag/system')
 
         expect(result).to eq("You are a helpful assistant.\n")
       end
@@ -56,8 +56,7 @@ RSpec.describe Spectre::Prompt do
 
       it 'returns the rendered user prompt with local variables' do
         result = described_class.render(
-          type: 'rag',
-          prompt: :user,
+          template: 'rag/user',
           locals: { query: query, objects: objects }
         )
         expected_result = "User's query: What is AI?\nContext: AI is cool, AI is the future\n"
