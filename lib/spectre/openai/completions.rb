@@ -21,7 +21,7 @@ module Spectre
       # @return [String] the generated completion text
       # @raise [APIKeyNotConfiguredError] if the API key is not set
       # @raise [RuntimeError] for general API errors or unexpected issues
-      def self.generate(user_prompt:, system_prompt: "You are a helpful assistant.", assistant_prompt: nil, model: DEFAULT_MODEL, json_schema: nil, max_tokens: nil)
+      def self.create(user_prompt:, system_prompt: "You are a helpful assistant.", assistant_prompt: nil, model: DEFAULT_MODEL, json_schema: nil, max_tokens: nil)
         api_key = Spectre.api_key
         raise APIKeyNotConfiguredError, "API key is not configured" unless api_key
 

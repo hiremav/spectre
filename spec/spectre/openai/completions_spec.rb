@@ -22,7 +22,7 @@ RSpec.describe Spectre::Openai::Completions do
 
       it 'raises an APIKeyNotConfiguredError' do
         expect {
-          described_class.generate(user_prompt: user_prompt, system_prompt: system_prompt)
+          described_class.create(user_prompt: user_prompt, system_prompt: system_prompt)
         }.to raise_error(Spectre::APIKeyNotConfiguredError, 'API key is not configured')
       end
     end
@@ -34,7 +34,7 @@ RSpec.describe Spectre::Openai::Completions do
       end
 
       it 'returns the completion text' do
-        result = described_class.generate(user_prompt: user_prompt, system_prompt: system_prompt, assistant_prompt: assistant_prompt)
+        result = described_class.create(user_prompt: user_prompt, system_prompt: system_prompt, assistant_prompt: assistant_prompt)
         expect(result).to eq(completion)
       end
     end
@@ -47,7 +47,7 @@ RSpec.describe Spectre::Openai::Completions do
 
       it 'raises an error with the API response' do
         expect {
-          described_class.generate(user_prompt: user_prompt, system_prompt: system_prompt)
+          described_class.create(user_prompt: user_prompt, system_prompt: system_prompt)
         }.to raise_error(RuntimeError, /OpenAI API Error/)
       end
     end
@@ -60,7 +60,7 @@ RSpec.describe Spectre::Openai::Completions do
 
       it 'raises a JSON Parse Error' do
         expect {
-          described_class.generate(user_prompt: user_prompt, system_prompt: system_prompt)
+          described_class.create(user_prompt: user_prompt, system_prompt: system_prompt)
         }.to raise_error(RuntimeError, /JSON Parse Error/)
       end
     end
@@ -73,7 +73,7 @@ RSpec.describe Spectre::Openai::Completions do
 
       it 'raises a Request Timeout error' do
         expect {
-          described_class.generate(user_prompt: user_prompt, system_prompt: system_prompt)
+          described_class.create(user_prompt: user_prompt, system_prompt: system_prompt)
         }.to raise_error(RuntimeError, /Request Timeout/)
       end
     end
@@ -88,7 +88,7 @@ RSpec.describe Spectre::Openai::Completions do
 
       it 'raises an incomplete response error' do
         expect {
-          described_class.generate(user_prompt: user_prompt, system_prompt: system_prompt)
+          described_class.create(user_prompt: user_prompt, system_prompt: system_prompt)
         }.to raise_error(RuntimeError, /Incomplete response: The completion was cut off due to token limit./)
       end
     end
@@ -102,7 +102,7 @@ RSpec.describe Spectre::Openai::Completions do
       end
 
       it 'sends the max_tokens parameter in the request' do
-        described_class.generate(user_prompt: user_prompt, system_prompt: system_prompt, max_tokens: max_tokens)
+        described_class.create(user_prompt: user_prompt, system_prompt: system_prompt, max_tokens: max_tokens)
 
         expect(a_request(:post, Spectre::Openai::Completions::API_URL)
                  .with(body: hash_including(max_tokens: max_tokens))).to have_been_made
@@ -118,7 +118,7 @@ RSpec.describe Spectre::Openai::Completions do
       end
 
       it 'sends the json_schema in the request' do
-        described_class.generate(user_prompt: user_prompt, system_prompt: system_prompt, json_schema: json_schema)
+        described_class.create(user_prompt: user_prompt, system_prompt: system_prompt, json_schema: json_schema)
 
         expect(a_request(:post, Spectre::Openai::Completions::API_URL)
                  .with { |req| JSON.parse(req.body)['response_format']['json_schema'] == JSON.parse(json_schema.to_json) }).to have_been_made.once
@@ -137,7 +137,7 @@ RSpec.describe Spectre::Openai::Completions do
 
       it 'raises a refusal error' do
         expect {
-          described_class.generate(user_prompt: user_prompt, system_prompt: system_prompt)
+          described_class.create(user_prompt: user_prompt, system_prompt: system_prompt)
         }.to raise_error(RuntimeError, /Refusal: I'm sorry, I cannot assist with that request./)
       end
     end
