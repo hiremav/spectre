@@ -1,6 +1,6 @@
 # Spectre
 
-**Spectre** is a Ruby gem that makes it easy to AI-enable your Ruby on Rails application. Currently, Spectre focuses on helping developers perform vector-based searches, generate embeddings, and manage multiple dynamic prompts — ideal for applications that require RAG (Retrieval-Augmented Generation) and dynamic prompts.
+**Spectre** is a Ruby gem that makes it easy to AI-enable your Ruby on Rails application. Currently, Spectre focuses on helping developers generate embeddings, perform vector-based searches, and manage multiple dynamic prompts — ideal for applications that require RAG (Retrieval-Augmented Generation) and other dynamic prompts.
 
 ## Compatibility
 
@@ -11,8 +11,7 @@
 | Vector Searching        | MongoDB Atlas |
 | Prompt Templates        | OpenAI        |
 
-
-**💡 Note:** We'll first be prioritizing additional foundation models (Claude, Cohere, LLaMA, etc), then looking to add additional support for more vector database (Pgvector, Pinecone, etc). If you're looking for something a bit more extendable we highly recommend checking out [langchainrb](https://github.com/patterns-ai-core/langchainrb).
+**💡 Note:** We'll first be prioritizing additional foundation models (Claude, Cohere, LLaMA, etc), then looking to add additional support for more vector databases (Pgvector, Pinecone, etc). If you're looking for something a bit more extendable we highly recommend checking out [langchainrb](https://github.com/patterns-ai-core/langchainrb).
 
 ## Installation
 
@@ -46,9 +45,7 @@ Spectre.setup do |config|
   config.llm_provider = :openai
 end
 ```
-### 2. Integrate Spectre with Your Rails Model
-
-**2.1. Embeddable Module**
+### 2. Enable Your Rails Model(s) for Embedding
 
 To use Spectre for generating embeddings in your Rails model, follow these steps:
 
@@ -67,9 +64,9 @@ class Model
 end
 ```
 
-**2.2. Searchable Module (MongoDB Only)**
+### 2.2. Enable Your Rails Model(s) for Vector Searching (MongoDB Only)**
 
-**Note:** The `Searchable` module is designed to work exclusively with Mongoid models. If you attempt to include it in a non-Mongoid model, an error will be raised. This ensures that vector-based searches, which rely on MongoDB's specific features, are only used in appropriate contexts.
+**Note:** Currently, the `Searchable` module is designed to work exclusively with Mongoid models. If you attempt to include it in a non-Mongoid model, an error will be raised. This ensures that vector-based searches, which rely on MongoDB's specific features, are only used in appropriate contexts.
 
 To enable vector-based search in your Rails model:
 
@@ -142,41 +139,41 @@ Model.vector_search('Your search query', custom_result_fields: { "response" => 1
 
 This method will:
 
-•	Embed the search query using the configured LLM provider.
+•	Embed the search query using the configured LLM provider. **Note:** If your text is already embeded, you can pass the embed _(as a Array)_ and it will perform just the search.
 
 •	Perform a vector-based search on the embeddings stored in the specified search_path.
 
 •	Return the matching records with the specified result_fields and their vectorSearchScore.
 
-**Examples:**
+**Keyword Arguments:**
 
 •	**Custom Result Fields**: Limit the fields returned in the search results.
 
 •	**Additional Scopes**: Apply additional MongoDB filters to the search results.
 
-### 5. Generating Completions
+### 5. Creating Completions
 
-Spectre provides an interface to generate text completions using your configured LLM provider, allowing you to generate dynamic responses, messages, or other forms of text.
+Spectre provides an interface to generate chat completions using your configured LLM provider, allowing you to generate dynamic responses, messages, or other forms of text.
 
 **Basic Completion Example**
 
-To generate a simple text completion, use the Spectre.provider_module::Completions.generate method. You can provide a user prompt and an optional system prompt to guide the response:
+To generate a simple chat completion, use the Spectre.provider_module::Completions.generate method. You can provide a user prompt and an optional system prompt to guide the response:
     
 ```ruby
-Spectre.provider_module::Completions.generate(
+Spectre.provider_module::Completions.create(
   user_prompt: "Tell me a joke.",
   system_prompt: "You are a funny assistant."
 )
 ```
 
-This sends the request to the LLM provider’s API and returns the generated completion.
+This sends the request to the LLM provider’s API and returns the generated chat completion.
 
 **Customizing the Completion**
 
 You can customize the behavior by specifying additional parameters such as the model or an assistant_prompt to provide further context for the AI’s responses:
 
 ```ruby
-Spectre.provider_module::Completions.generate(
+Spectre.provider_module::Completions.create(
   user_prompt: "Tell me a joke.",
   system_prompt: "You are a funny assistant.",
   assistant_prompt: "Sure, here's a joke!",
@@ -202,7 +199,7 @@ json_schema = {
   }
 }
 
-Spectre.provider_module::Completions.generate(
+Spectre.provider_module::Completions.create(
   user_prompt: "What is the capital of France?",
   system_prompt: "You are a knowledgeable assistant.",
   json_schema: json_schema
@@ -266,12 +263,15 @@ Spectre::Prompt.render(
 •	template: The path to the prompt template file (e.g., rag/system).
 •	locals: A hash of variables to be used inside the ERB template.
 
-**Generating Example Prompt Files**
+**Combining Completions with Prompts**
 
-You can use a Rails generator to create example prompt files in your project. Run the following command:
+You can also combine a Compleitions and Prompts like so:
 
-```bash
-rails generate spectre:install
+```ruby
+Spectre.provider_module::Completions.create(
+  user_prompt: Spectre::Prompt.render(template: 'rag/user', locals: {query: @query, user: @user}),
+  system_prompt: Spectre::Prompt.render(template: 'rag/system')
+)
 ```
 
 ## Contributing
