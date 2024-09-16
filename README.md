@@ -1,4 +1,4 @@
-# Spectre
+# Spectre [![Gem Version](https://badge.fury.io/rb/spectre_ai.svg)](https://badge.fury.io/rb/spectre_ai)
 
 **Spectre** is a Ruby gem that makes it easy to AI-enable your Ruby on Rails application. Currently, Spectre focuses on helping developers create embeddings, perform vector-based searches, create chat completions, and manage dynamic prompts — ideal for applications that are featuring RAG (Retrieval-Augmented Generation), chatbots and dynamic prompts.
 
