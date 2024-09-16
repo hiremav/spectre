@@ -18,7 +18,7 @@
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'spectre'
+gem 'spectre_ai'
 ```
 
 And then execute:

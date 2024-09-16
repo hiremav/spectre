@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'spectre'
+
 Spectre.setup do |config|
   # Chose your LLM (openai, cohere, ollama)
   config.llm_provider = :openai
