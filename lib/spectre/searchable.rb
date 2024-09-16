@@ -90,7 +90,7 @@ module Spectre
       def vector_search(query, limit: 5, additional_scopes: [], custom_result_fields: nil)
         # Check if the query is a string (needs embedding) or an array (already embedded)
         embedded_query = if query.is_a?(String)
-                           Spectre.provider_module::Embeddings.generate(query)
+                           Spectre.provider_module::Embeddings.create(query)
                          elsif query.is_a?(Array) && query.all? { |e| e.is_a?(Float) }
                            query
                          else

@@ -37,7 +37,7 @@ RSpec.describe Spectre::Embeddable do
 
   describe '#embed!' do
     before do
-      allow(Spectre::Openai::Embeddings).to receive(:generate).and_return('embedded_value')
+      allow(Spectre::Openai::Embeddings).to receive(:create).and_return('embedded_value')
     end
 
     context 'when validation passes' do
@@ -68,7 +68,7 @@ RSpec.describe Spectre::Embeddable do
 
   describe '.embed_all!' do
     before do
-      allow(Spectre::Openai::Embeddings).to receive(:generate).and_return('embedded_value')
+      allow(Spectre::Openai::Embeddings).to receive(:create).and_return('embedded_value')
     end
 
     context 'for all records' do

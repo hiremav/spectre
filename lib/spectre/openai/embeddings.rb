@@ -17,7 +17,7 @@ module Spectre
       # @return [Array<Float>] the generated embedding vector
       # @raise [APIKeyNotConfiguredError] if the API key is not set
       # @raise [RuntimeError] for general API errors or unexpected issues
-      def self.generate(text, model: DEFAULT_MODEL)
+      def self.create(text, model: DEFAULT_MODEL)
         api_key = Spectre.api_key
         raise APIKeyNotConfiguredError, "API key is not configured" unless api_key
 

@@ -20,7 +20,7 @@ RSpec.describe Spectre::Openai::Embeddings do
 
       it 'raises an APIKeyNotConfiguredError' do
         expect {
-          described_class.generate(text)
+          described_class.create(text)
         }.to raise_error(Spectre::APIKeyNotConfiguredError, 'API key is not configured')
       end
     end
@@ -32,7 +32,7 @@ RSpec.describe Spectre::Openai::Embeddings do
       end
 
       it 'returns the embedding' do
-        result = described_class.generate(text)
+        result = described_class.create(text)
         expect(result).to eq(embedding)
       end
     end
@@ -45,7 +45,7 @@ RSpec.describe Spectre::Openai::Embeddings do
 
       it 'raises an error with the API response' do
         expect {
-          described_class.generate(text)
+          described_class.create(text)
         }.to raise_error(RuntimeError, /OpenAI API Error/)
       end
     end
@@ -58,7 +58,7 @@ RSpec.describe Spectre::Openai::Embeddings do
 
       it 'raises a JSON Parse Error' do
         expect {
-          described_class.generate(text)
+          described_class.create(text)
         }.to raise_error(RuntimeError, /JSON Parse Error/)
       end
     end
@@ -71,7 +71,7 @@ RSpec.describe Spectre::Openai::Embeddings do
 
       it 'raises a Request Timeout error' do
         expect {
-          described_class.generate(text)
+          described_class.create(text)
         }.to raise_error(RuntimeError, /Request Timeout/)
       end
     end

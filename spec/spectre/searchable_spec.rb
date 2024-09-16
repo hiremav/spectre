@@ -13,7 +13,7 @@ RSpec.describe Spectre::Searchable do
       config.llm_provider = :openai
     end
 
-    allow(Spectre::Openai::Embeddings).to receive(:generate).and_return([0.1, 0.2, 0.3])
+    allow(Spectre::Openai::Embeddings).to receive(:create).and_return([0.1, 0.2, 0.3])
 
     # Mock the aggregate method on the collection to simulate MongoDB's aggregation pipeline
     allow(TestModel.collection).to receive(:aggregate).and_return([
@@ -62,8 +62,8 @@ RSpec.describe Spectre::Searchable do
       it 'uses the provided embedding directly' do
         embedded_query = [0.1, 0.2, 0.3]
 
-        # Ensure that the generate method is not called
-        expect(Spectre::Openai::Embeddings).not_to receive(:generate)
+        # Ensure that the create method is not called
+        expect(Spectre::Openai::Embeddings).not_to receive(:create)
 
         results = TestModel.vector_search(embedded_query)
         expect(results).to be_an(Array)

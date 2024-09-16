@@ -43,7 +43,7 @@ module Spectre
         raise EmbeddingValidationError, "Validation failed for embedding"
       end
 
-      embedding_value = Spectre.provider_module::Embeddings.generate(as_vector)
+      embedding_value = Spectre.provider_module::Embeddings.create(as_vector)
       send("#{embedding_field}=", embedding_value)
       send("#{timestamp_field}=", Time.now)
       save!
