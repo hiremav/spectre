@@ -30,7 +30,7 @@ bundle install
 Or install it yourself as:
 
 ```bash
-gem install spectre
+gem install spectre_ai
 ```
 
 ## Usage
