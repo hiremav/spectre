@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    spectre (0.0.1)
+    spectre (1.0.0)
 
 GEM
   remote: https://rubygems.org/
