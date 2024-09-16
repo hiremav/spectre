@@ -18,7 +18,7 @@
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'spectre'
+gem 'spectre_ai'
 ```
 
 And then execute:
@@ -30,7 +30,7 @@ bundle install
 Or install it yourself as:
 
 ```bash
-gem install spectre
+gem install spectre_ai
 ```
 
 ## Usage

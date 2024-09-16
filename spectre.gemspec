@@ -3,13 +3,13 @@
 require_relative "lib/spectre/version"
 
 Gem::Specification.new do |s|
-  s.name        = 'spectre'
+  s.name        = 'spectre_ai'
   s.version     = Spectre::VERSION
-  s.summary     = "MAV Spectre"
-  s.description = "Abstraction layer of making and managing LLM prompts invisible"
+  s.summary     = "Spectre"
+  s.description = "Spectre is a Ruby gem that makes it easy to AI-enable your Ruby on Rails application."
   s.authors     = ["Ilya Klapatok", "Matthew Black"]
   s.email       = 'ilya@hiremav.com'
-  s.homepage    = 'https://github.com/Vantablack-Holdings/spectre'
+  s.homepage    = 'https://github.com/hiremav/spectre'
   s.license     = 'MIT'
 
   s.files = Dir.glob("lib/**/*") + %w[README.md CHANGELOG.md]
