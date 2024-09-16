@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    spectre (1.0.0)
+    spectre_ai (1.0.0)
 
 GEM
   remote: https://rubygems.org/
@@ -137,7 +137,7 @@ PLATFORMS
 DEPENDENCIES
   pry
   rspec-rails
-  spectre!
+  spectre_ai!
   webmock
 
 BUNDLED WITH
