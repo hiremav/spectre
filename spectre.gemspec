@@ -5,7 +5,7 @@ require_relative "lib/spectre/version"
 Gem::Specification.new do |s|
   s.name        = 'spectre_ai'
   s.version     = Spectre::VERSION
-  s.summary     = "MAV Spectre"
+  s.summary     = "Spectre"
   s.description = "Spectre is a Ruby gem that makes it easy to AI-enable your Ruby on Rails application."
   s.authors     = ["Ilya Klapatok", "Matthew Black"]
   s.email       = 'ilya@hiremav.com'
