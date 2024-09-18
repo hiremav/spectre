@@ -2,7 +2,6 @@
 
 require 'erb'
 require 'yaml'
-require_relative 'logging'
 
 module Spectre
   class Prompt
