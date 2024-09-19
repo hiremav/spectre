@@ -1,6 +1,6 @@
 # Changelog for Version 1.0.1
 
-**Release Date:** [18th Sep 2024]
+**Release Date:** [19th Sep 2024]
 
 **Improvements to Prompt Class**
 
