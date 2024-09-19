@@ -28,7 +28,7 @@ RSpec.describe Spectre::Prompt do
     prompts_folder = File.join(@tmpdir, 'rag')
     FileUtils.mkdir_p(prompts_folder)
 
-    # Write the mock system_prompt.yml.erb and user_prompt.yml.erb files
+    # Write the mock system.yml.erb and user.yml.erb files
     File.write(File.join(prompts_folder, 'system.yml.erb'), system_prompt_content)
     File.write(File.join(prompts_folder, 'user.yml.erb'), user_prompt_content)
 
@@ -45,7 +45,6 @@ RSpec.describe Spectre::Prompt do
     context 'when generating the system prompt' do
       it 'returns the rendered system prompt' do
         result = described_class.render(template: 'rag/system')
-
         expect(result).to eq("You are a helpful assistant.\n")
       end
     end
@@ -59,7 +58,23 @@ RSpec.describe Spectre::Prompt do
           template: 'rag/user',
           locals: { query: query, objects: objects }
         )
+
         expected_result = "User's query: What is AI?\nContext: AI is cool, AI is the future\n"
+        expect(result).to eq(expected_result)
+      end
+    end
+
+    context 'when locals contain special characters' do
+      let(:query) { 'What is <AI> & why is it important?' }
+      let(:objects) { ['AI & ML', 'Future of AI'] }
+
+      it 'escapes and restores special characters in the user prompt' do
+        result = described_class.render(
+          template: 'rag/user',
+          locals: { query: query, objects: objects }
+        )
+
+        expected_result = "User's query: What is <AI> & why is it important?\nContext: AI & ML, Future of AI\n"
         expect(result).to eq(expected_result)
       end
     end

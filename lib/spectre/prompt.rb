@@ -19,13 +19,26 @@ module Spectre
 
       raise "Prompt file not found: #{file_path}" unless File.exist?(file_path)
 
+      # Preprocess the locals before rendering the YAML file
+      preprocessed_locals = preprocess_locals(locals)
+
       template_content = File.read(file_path)
       erb_template = ERB.new(template_content)
 
-      context = Context.new(locals)
+      context = Context.new(preprocessed_locals)
       rendered_prompt = erb_template.result(context.get_binding)
 
-      YAML.safe_load(rendered_prompt)[prompt]
+      # YAML.safe_load returns a hash, so fetch the correct part based on the prompt
+      parsed_yaml = YAML.safe_load(rendered_prompt)[prompt]
+
+      # Convert special characters back after YAML processing
+      convert_special_chars_back(parsed_yaml)
+    rescue Errno::ENOENT
+      raise "Template file not found at path: #{file_path}"
+    rescue Psych::SyntaxError => e
+      raise "YAML Syntax Error in file #{file_path}: #{e.message}"
+    rescue StandardError => e
+      raise "Error rendering prompt for template '#{template}': #{e.message}"
     end
 
     private
@@ -48,7 +61,54 @@ module Spectre
       "#{PROMPTS_PATH}/#{type}/#{prompt}.yml.erb"
     end
 
-    # Helper class to handle the binding for ERB rendering
+    # Preprocess locals recursively to escape special characters in strings
+    #
+    # @param value [Object] The value to process (string, array, hash, etc.)
+    # @return [Object] Processed value with special characters escaped
+    def self.preprocess_locals(value)
+      case value
+      when String
+        escape_special_chars(value)
+      when Hash
+        value.transform_values { |v| preprocess_locals(v) } # Recurse into hash values
+      when Array
+        value.map { |item| preprocess_locals(item) } # Recurse into array items
+      else
+        value
+      end
+    end
+
+    # Escape special characters in strings to avoid YAML parsing issues
+    #
+    # @param value [String] The string to process
+    # @return [String] The processed string with special characters escaped
+    def self.escape_special_chars(value)
+      value.gsub('&', '&amp;')
+           .gsub('<', '&lt;')
+           .gsub('>', '&gt;')
+           .gsub('"', '&quot;')
+           .gsub("'", '&#39;')
+           .gsub("\n", '\\n')
+           .gsub("\r", '\\r')
+           .gsub("\t", '\\t')
+    end
+
+    # Convert special characters back to their original form after YAML processing
+    #
+    # @param value [String] The string to process
+    # @return [String] The processed string with original special characters restored
+    def self.convert_special_chars_back(value)
+      value.gsub('&amp;', '&')
+           .gsub('&lt;', '<')
+           .gsub('&gt;', '>')
+           .gsub('&quot;', '"')
+           .gsub('&#39;', "'")
+           .gsub('\\n', "\n")
+           .gsub('\\r', "\r")
+           .gsub('\\t', "\t")
+    end
+
+    # Helper class to handle the binding for ERB template rendering
     class Context
       def initialize(locals)
         locals.each do |key, value|
