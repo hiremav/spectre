@@ -24,8 +24,7 @@ module Spectre
         api_key = Spectre.api_key
         raise APIKeyNotConfiguredError, "API key is not configured" unless api_key
 
-        # Check if messages are empty or not an array
-        raise ArgumentError, "Messages cannot be blank or empty." if messages.blank? || !messages.is_a?(Array)
+        validate_messages!(messages)
 
         uri = URI(API_URL)
         http = Net::HTTP.new(uri.host, uri.port)
@@ -55,6 +54,46 @@ module Spectre
       end
 
       private
+
+      # Validate the structure and content of the messages array.
+      #
+      # @param messages [Array<Hash>] The array of message hashes to validate.
+      #
+      # @raise [ArgumentError] if the messages array is not in the expected format or contains invalid data.
+      def self.validate_messages!(messages)
+        # Check if messages is an array of hashes.
+        # This ensures that the input is in the correct format for message processing.
+        unless messages.is_a?(Array) && messages.all? { |msg| msg.is_a?(Hash) }
+          raise ArgumentError, "Messages must be an array of message hashes."
+        end
+
+        # Check if the array is empty.
+        # This prevents requests with no messages, which would be invalid.
+        if messages.empty?
+          raise ArgumentError, "Messages cannot be empty."
+        end
+
+        # Iterate through each message and perform detailed validation.
+        messages.each_with_index do |msg, index|
+          # Check if each message hash contains the required keys: :role and :content.
+          # These keys are necessary for defining the type of message and its content.
+          unless msg.key?(:role) && msg.key?(:content)
+            raise ArgumentError, "Message at index #{index} must contain both :role and :content keys."
+          end
+
+          # Check if the role is one of the allowed values: 'system', 'user', or 'assistant'.
+          # This ensures that each message has a valid role identifier.
+          unless %w[system user assistant].include?(msg[:role])
+            raise ArgumentError, "Invalid role '#{msg[:role]}' at index #{index}. Valid roles are 'system', 'user', 'assistant'."
+          end
+
+          # Check if the content is a non-empty string.
+          # This prevents empty or non-string content, which would be meaningless in a conversation.
+          unless msg[:content].is_a?(String) && !msg[:content].strip.empty?
+            raise ArgumentError, "Content for message at index #{index} must be a non-empty string."
+          end
+        end
+      end
 
       # Helper method to generate the request body
       #
@@ -113,7 +152,6 @@ module Spectre
         # Handle unexpected finish reasons
         raise "Unexpected finish_reason: #{finish_reason}"
       end
-
     end
   end
 end
