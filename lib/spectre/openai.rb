@@ -5,5 +5,6 @@ module Spectre
     # Require each specific client file here
     require_relative 'openai/embeddings'
     require_relative 'openai/completions'
+    require_relative 'openai/functions'
   end
 end
