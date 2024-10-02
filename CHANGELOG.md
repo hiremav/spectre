@@ -28,7 +28,7 @@ To upgrade, update your Gemfile to version 1.0.1 and run bundle install. Make su
 
 # Changelog for Version 1.1.0
 
-**Release Date:** [26th Sep 2024]
+**Release Date:** [2nd Oct 2024]
 
 **New Features:**
 
