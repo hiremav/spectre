@@ -32,7 +32,7 @@ To upgrade, update your Gemfile to version 1.0.1 and run bundle install. Make su
 
 **New Features:**
 
-* **Tools Integration:** Added support for tools parameter to enable function calling during completions. Now you can specify an array of tool definitions that the model can use to call specific functions.
+* **Tool _(Function Calling)_ Integration:** Added support for tools parameter to enable function calling during completions. Now you can specify an array of tool definitions that the model can use to call specific functions.
 
 * **Enhanced Message Handling:** Replaced individual prompt parameters (user_prompt, system_prompt, assistant_prompt) with a single messages array parameter, which accepts a sequence of messages with their roles and contents. This provides more flexibility in managing conversations.
 
