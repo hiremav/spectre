@@ -241,7 +241,7 @@ This structured format guarantees that the response adheres to the schema you’
 
 **Using Tools for Function Calling**
 
-You can also incorporate tools (function calls) in your completion to handle more complex interactions such as fetching information or performing calculations. Define tools using the function call format and include them in the request:
+You can incorporate tools (function calls) in your completion to handle more complex interactions such as fetching external information via API or performing calculations. Define tools using the function call format and include them in the request:
 
 ```ruby
 tools = [
