@@ -275,6 +275,50 @@ Spectre.provider_module::Completions.create(
 
 This setup allows the model to call specific tools (or functions) based on the user's input. The model can then generate a tool call to get necessary information and integrate it into the conversation.
 
+**Handling Responses from Completions with Tools**
+
+When tools (function calls) are included in a completion request, the response might include `tool_calls` with relevant details for executing the function.
+
+Here’s an example of how the response might look when a tool call is made:
+
+```ruby
+response = Spectre.provider_module::Completions.create(
+  messages: messages,
+  tools: tools
+)
+
+# Sample response structure when a tool call is triggered:
+# {
+#   :tool_calls=>[{
+#     "id" => "call_gqvSz1JTDfUyky7ghqY1wMoy",
+#     "type" => "function",
+#     "function" => {
+#       "name" => "get_lead_count",
+#       "arguments" => "{\"account_id\":\"acc_12312\"}"
+#     }
+#   }],
+#   :content => nil
+# }
+
+if response[:tool_calls]
+  tool_call = response[:tool_calls].first
+
+  # You can now perform the function using the provided data
+  # For example, get the lead count by account_id
+  account_id = JSON.parse(tool_call['function']['arguments'])['account_id']
+  lead_count = get_lead_count(account_id) # Assuming you have a method for this
+
+  # Respond back with the function result
+  completion_response = Spectre.provider_module::Completions.create(
+    messages: [
+      { role: 'assistant', content: "There are #{lead_count} leads for account #{account_id}." }
+    ]
+  )
+else
+  puts "Model response: #{response[:content]}"
+end
+```
+
 ### 6. Creating Dynamic Prompts
 
 Spectre provides a system for creating dynamic prompts based on templates. You can define reusable prompt templates and render them with different parameters in your Rails app (think Ruby on Rails view partials).
