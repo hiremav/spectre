@@ -175,25 +175,36 @@ Spectre provides an interface to create chat completions using your configured L
 To create a simple chat completion, use the `Spectre.provider_module::Completions.create` method. You can provide a user prompt and an optional system prompt to guide the response:
 
 ```ruby
+messages = [
+        { role: 'system', content: "You are a funny assistant." },
+        { role: 'user', content: "Tell me a joke." }
+]
+
 Spectre.provider_module::Completions.create(
-  user_prompt: "Tell me a joke.",
-  system_prompt: "You are a funny assistant."
+        messages: messages
 )
+
 ```
 
 This sends the request to the LLM provider’s API and returns the chat completion.
 
 **Customizing the Completion**
 
-You can customize the behavior by specifying additional parameters such as the model or an `assistant_prompt` to provide further context for the AI’s responses:
+You can customize the behavior by specifying additional parameters such as the model, maximum number of tokens, and any tools needed for function calls:
 
 ```ruby
+messages = [
+        { role: 'system', content: "You are a funny assistant." },
+        { role: 'user', content: "Tell me a joke." },
+        { role: 'assistant', content: "Sure, here's a joke!" }
+]
+
 Spectre.provider_module::Completions.create(
-  user_prompt: "Tell me a joke.",
-  system_prompt: "You are a funny assistant.",
-  assistant_prompt: "Sure, here's a joke!",
-  model: "gpt-4"
+        messages: messages,
+        model: "gpt-4",
+        max_tokens: 50
 )
+
 ```
 
 **Using a JSON Schema for Structured Output**
@@ -214,14 +225,99 @@ json_schema = {
   }
 }
 
+messages = [
+  { role: 'system', content: "You are a knowledgeable assistant." },
+  { role: 'user', content: "What is the capital of France?" }
+]
+
 Spectre.provider_module::Completions.create(
-  user_prompt: "What is the capital of France?",
-  system_prompt: "You are a knowledgeable assistant.",
+  messages: messages,
   json_schema: json_schema
 )
+
 ```
 
 This structured format guarantees that the response adheres to the schema you’ve provided, ensuring more predictable and controlled results.
+
+**Using Tools for Function Calling**
+
+You can incorporate tools (function calls) in your completion to handle more complex interactions such as fetching external information via API or performing calculations. Define tools using the function call format and include them in the request:
+
+```ruby
+tools = [
+  {
+    type: "function",
+    function: {
+      name: "get_delivery_date",
+      description: "Get the delivery date for a customer's order.",
+      parameters: {
+        type: "object",
+        properties: {
+          order_id: { type: "string", description: "The customer's order ID." }
+        },
+        required: ["order_id"],
+        additionalProperties: false
+      }
+    }
+  }
+]
+
+messages = [
+  { role: 'system', content: "You are a helpful customer support assistant." },
+  { role: 'user', content: "Can you tell me the delivery date for my order?" }
+]
+
+Spectre.provider_module::Completions.create(
+  messages: messages,
+  tools: tools
+)
+```
+
+This setup allows the model to call specific tools (or functions) based on the user's input. The model can then generate a tool call to get necessary information and integrate it into the conversation.
+
+**Handling Responses from Completions with Tools**
+
+When tools (function calls) are included in a completion request, the response might include `tool_calls` with relevant details for executing the function.
+
+Here’s an example of how the response might look when a tool call is made:
+
+```ruby
+response = Spectre.provider_module::Completions.create(
+  messages: messages,
+  tools: tools
+)
+
+# Sample response structure when a tool call is triggered:
+# {
+#   :tool_calls=>[{
+#     "id" => "call_gqvSz1JTDfUyky7ghqY1wMoy",
+#     "type" => "function",
+#     "function" => {
+#       "name" => "get_lead_count",
+#       "arguments" => "{\"account_id\":\"acc_12312\"}"
+#     }
+#   }],
+#   :content => nil
+# }
+
+if response[:tool_calls]
+  tool_call = response[:tool_calls].first
+
+  # You can now perform the function using the provided data
+  # For example, get the lead count by account_id
+  account_id = JSON.parse(tool_call['function']['arguments'])['account_id']
+  lead_count = get_lead_count(account_id) # Assuming you have a method for this
+
+  # Respond back with the function result
+  completion_response = Spectre.provider_module::Completions.create(
+    messages: [
+      { role: 'assistant', content: "There are #{lead_count} leads for account #{account_id}." }
+    ]
+  )
+else
+  puts "Model response: #{response[:content]}"
+end
+```
 
 ### 6. Creating Dynamic Prompts
 
@@ -287,9 +383,12 @@ You can also combine completions and prompts like so:
 
 ```ruby
 Spectre.provider_module::Completions.create(
-  user_prompt: Spectre::Prompt.render(template: 'rag/user', locals: { query: @query, user: @user }),
-  system_prompt: Spectre::Prompt.render(template: 'rag/system')
+  messages: [
+    { role: 'system', content: Spectre::Prompt.render(template: 'rag/system') },
+    { role: 'user', content: Spectre::Prompt.render(template: 'rag/user', locals: { query: @query, user: @user }) }
+  ]
 )
+
 ```
 
 ## Contributing
