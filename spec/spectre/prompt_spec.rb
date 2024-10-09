@@ -32,8 +32,8 @@ RSpec.describe Spectre::Prompt do
     File.write(File.join(prompts_folder, 'system.yml.erb'), system_prompt_content)
     File.write(File.join(prompts_folder, 'user.yml.erb'), user_prompt_content)
 
-    # Temporarily set the PROMPTS_PATH to the tmp directory
-    stub_const('Spectre::Prompt::PROMPTS_PATH', @tmpdir)
+    # Temporarily set the prompts_path to the tmp directory
+    allow(Spectre::Prompt).to receive(:prompts_path).and_return(@tmpdir)
   end
 
   after do
@@ -76,6 +76,34 @@ RSpec.describe Spectre::Prompt do
 
         expected_result = "User's query: What is <AI> & why is it important?\nContext: AI & ML, Future of AI\n"
         expect(result).to eq(expected_result)
+      end
+    end
+
+    context 'when the prompt file is not found' do
+      it 'raises an error indicating the file is missing' do
+        expect {
+          described_class.render(template: 'nonexistent_template')
+        }.to raise_error(RuntimeError, /Prompt file not found/)
+      end
+    end
+
+    context 'when there is a YAML syntax error in the prompt file' do
+      let(:invalid_yaml_content) do
+        <<~ERB
+      system: |
+        You are a helpful assistant.
+      This line should cause a YAML error because it is missing indentation or a key
+    ERB
+      end
+
+      before do
+        File.write(File.join(@tmpdir, 'rag/system.yml.erb'), invalid_yaml_content)
+      end
+
+      it 'raises a YAML syntax error' do
+        expect {
+          described_class.render(template: 'rag/system')
+        }.to raise_error(RuntimeError, /YAML Syntax Error/)
       end
     end
   end
