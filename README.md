@@ -49,6 +49,7 @@ This will create a file at `config/initializers/spectre.rb`, where you can set y
 Spectre.setup do |config|
   config.api_key = 'your_openai_api_key'
   config.llm_provider = :openai
+  config.root = Rails.root # Optional: Set the root path for the gem
 end
 ```
 
