@@ -91,3 +91,11 @@ This version enhances the flexibility and robustness of the Completions class, e
 * **Prompt Path Detection:**
     * Prompt paths now use the configured `root` to locate the template files. This ensures that Spectre works correctly in various environments where template paths may vary.
     
+
+* **Nested Template Support in Prompts**
+  * You can now organize your prompt files in nested directories and render them using the `Spectre::Prompt.render` method.
+  * **Example**: To render a template from a nested folder:
+    ```ruby
+    Spectre::Prompt.render(template: 'nested/folder/nested', locals: { query: 'What is AI?' })
+    ```
+  * This feature allows for better organization and scalability when dealing with multiple prompt categories and complex scenarios.

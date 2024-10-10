@@ -14,13 +14,13 @@ module Spectre
 
       # Render a prompt by reading and rendering the YAML template
       #
-      # @param template [String] The path to the template file, formatted as 'type/prompt' (e.g., 'rag/system')
+      # @param template [String] The path to the template file, formatted as 'folder1/folder2/prompt'
       # @param locals [Hash] Variables to be passed to the template for rendering
       #
       # @return [String] Rendered prompt
       def render(template:, locals: {})
-        type, prompt = split_template(template)
-        file_path = prompt_file_path(type, prompt)
+        path, prompt = split_template(template)
+        file_path = prompt_file_path(path, prompt)
 
         raise "Prompt file not found: #{file_path}" unless File.exist?(file_path)
 
@@ -57,22 +57,23 @@ module Spectre
         end
       end
 
-      # Split the template parameter into type and prompt
+      # Split the template parameter into path and prompt
       #
-      # @param template [String] Template path in the format 'type/prompt' (e.g., 'rag/system')
-      # @return [Array<String, String>] An array containing the type and prompt
+      # @param template [String] Template path in the format 'folder1/folder2/prompt'
+      # @return [Array<String, String>] An array containing the folder path and the prompt name
       def split_template(template)
-        template.split('/')
+        *path_parts, prompt = template.split('/')
+        [File.join(path_parts), prompt]
       end
 
       # Build the path to the desired prompt file
       #
-      # @param type [String] Name of the prompt folder
-      # @param prompt [String] Type of prompt (e.g., 'system', 'user')
+      # @param path [String] Path to the prompt folder(s)
+      # @param prompt [String] Name of the prompt file (e.g., 'system', 'user')
       #
       # @return [String] Full path to the template file
-      def prompt_file_path(type, prompt)
-        File.join(prompts_path, type, "#{prompt}.yml.erb")
+      def prompt_file_path(path, prompt)
+        File.join(prompts_path, path, "#{prompt}.yml.erb")
       end
 
       # Preprocess locals recursively to escape special characters in strings
