@@ -390,16 +390,20 @@ app/
       rag/
         system.yml.erb
         user.yml.erb
-      nested/
-        folder/
-          nested.yml.erb
+      classification/
+        intent/
+          system.yml.erb
+          user.yml.erb
+        entity/
+          system.yml.erb
+          user.yml.erb
 ```
 
 To render a prompt from a nested folder, simply pass the full path to the `template` argument:
 
 ```ruby
 # Rendering from a nested folder
-Spectre::Prompt.render(template: 'nested/folder/nested', locals: { query: 'What is AI?' })
+Spectre::Prompt.render(template: 'classification/intent/user', locals: { query: 'What is AI?' })
 ```
 
 This allows for more flexibility when organizing your prompt files, particularly when dealing with complex scenarios or multiple prompt categories.

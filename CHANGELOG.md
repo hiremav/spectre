@@ -78,6 +78,6 @@ This version enhances the flexibility and robustness of the Completions class, e
   * You can now organize your prompt files in nested directories and render them using the `Spectre::Prompt.render` method.
   * **Example**: To render a template from a nested folder:
     ```ruby
-    Spectre::Prompt.render(template: 'nested/folder/nested', locals: { query: 'What is AI?' })
+    Spectre::Prompt.render(template: 'classification/intent/user', locals: { query: 'What is AI?' })
     ```
   * This feature allows for better organization and scalability when dealing with multiple prompt categories and complex scenarios.
