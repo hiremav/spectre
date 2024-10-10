@@ -377,6 +377,37 @@ Spectre::Prompt.render(
 - **`template`:** The path to the prompt template file (e.g., `rag/system`).
 - **`locals`:** A hash of variables to be used inside the ERB template.
 
+**Using Nested Templates for Prompts**
+
+Spectre's `Prompt` class now supports rendering templates from nested directories. This allows you to better organize your prompt files in a structured folder hierarchy.
+
+You can organize your prompt templates in subfolders. For instance, you can have the following structure:
+
+```
+app/
+  spectre/
+    prompts/
+      rag/
+        system.yml.erb
+        user.yml.erb
+      classification/
+        intent/
+          system.yml.erb
+          user.yml.erb
+        entity/
+          system.yml.erb
+          user.yml.erb
+```
+
+To render a prompt from a nested folder, simply pass the full path to the `template` argument:
+
+```ruby
+# Rendering from a nested folder
+Spectre::Prompt.render(template: 'classification/intent/user', locals: { query: 'What is AI?' })
+```
+
+This allows for more flexibility when organizing your prompt files, particularly when dealing with complex scenarios or multiple prompt categories.
+
 **Combining Completions with Prompts**
 
 You can also combine completions and prompts like so:

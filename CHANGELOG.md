@@ -67,3 +67,17 @@ Code Refactoring:
 **Documentation:** Updated class-level documentation and method comments for better clarity and understanding of the class’s functionality and usage.
 
 This version enhances the flexibility and robustness of the Completions class, enabling more complex interactions and better error handling for different types of API responses.
+
+# Changelog for Version 1.1.1
+
+**Release Date:** [11th Oct 2024]
+
+**New Features:**
+
+* **Nested Template Support in Prompts**
+  * You can now organize your prompt files in nested directories and render them using the `Spectre::Prompt.render` method.
+  * **Example**: To render a template from a nested folder:
+    ```ruby
+    Spectre::Prompt.render(template: 'classification/intent/user', locals: { query: 'What is AI?' })
+    ```
+  * This feature allows for better organization and scalability when dealing with multiple prompt categories and complex scenarios.
