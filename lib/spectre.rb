@@ -36,7 +36,7 @@ module Spectre
   end
 
   class << self
-    attr_accessor :api_key, :llm_provider, :root
+    attr_accessor :api_key, :llm_provider
 
     def setup
       yield self

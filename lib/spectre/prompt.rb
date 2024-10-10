@@ -50,11 +50,7 @@ module Spectre
 
       # Detects the appropriate path for prompt templates
       def detect_prompts_path
-        if Spectre.root
-          File.join(Spectre.root, 'app', 'spectre', 'prompts')
-        else
-          File.join(Dir.pwd, 'app', 'spectre', 'prompts')
-        end
+        File.join(Dir.pwd, 'app', 'spectre', 'prompts')
       end
 
       # Split the template parameter into path and prompt

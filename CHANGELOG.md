@@ -74,24 +74,6 @@ This version enhances the flexibility and robustness of the Completions class, e
 
 **New Features:**
 
-* **Root Attribute in Configuration:**
-
-    * Introduced a `root` attribute to the Spectre configuration. This allows users to specify a custom root directory for loading prompts or other templates.
-    * Example usage in initializer:
-    ```ruby
-    Spectre.setup do |config|
-        config.api_key = 'your_openai_api_key'
-        config.root = Rails.root # or any custom path
-    end
-    ```
-    * If `root` is not set, Spectre will default to the current working directory (Dir.pwd).
-    * This is especially useful when integrating Spectre into other gems or non-Rails projects where the root directory might differ.
-
-
-* **Prompt Path Detection:**
-    * Prompt paths now use the configured `root` to locate the template files. This ensures that Spectre works correctly in various environments where template paths may vary.
-    
-
 * **Nested Template Support in Prompts**
   * You can now organize your prompt files in nested directories and render them using the `Spectre::Prompt.render` method.
   * **Example**: To render a template from a nested folder:
