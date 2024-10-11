@@ -9,7 +9,7 @@ module Spectre
       attr_reader :prompts_path
 
       def prompts_path
-        @prompts_path ||= detect_prompts_path
+        @prompts_path = detect_prompts_path
       end
 
       # Render a prompt by reading and rendering the YAML template
@@ -69,8 +69,8 @@ module Spectre
         while dir != '/' do
           # Check for Gemfile, .git directory, or config/application.rb (Rails)
           return dir if File.exist?(File.join(dir, 'Gemfile')) ||
-            File.directory?(File.join(dir, '.git')) ||
-            File.exist?(File.join(dir, 'config', 'application.rb'))
+            File.exist?(File.join(dir, 'config', 'application.rb')) ||
+            File.directory?(File.join(dir, '.git'))
 
           # Move up one directory
           dir = File.expand_path('..', dir)
