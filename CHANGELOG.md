@@ -70,7 +70,7 @@ This version enhances the flexibility and robustness of the Completions class, e
 
 # Changelog for Version 1.1.1
 
-**Release Date:** [11th Oct 2024]
+**Release Date:** [10th Oct 2024]
 
 **New Features:**
 
@@ -81,3 +81,16 @@ This version enhances the flexibility and robustness of the Completions class, e
     Spectre::Prompt.render(template: 'classification/intent/user', locals: { query: 'What is AI?' })
     ```
   * This feature allows for better organization and scalability when dealing with multiple prompt categories and complex scenarios.
+
+
+# Changelog for Version 1.1.2
+
+**Release Date:** [11th Oct 2024]
+
+**New Features:**
+
+* **Dynamic Project Root Detection for Prompts**
+  * The `Spectre::Prompt.render` method now dynamically detects the project root based on the presence of project-specific markers, such as `Gemfile`, `.git`, or `config/application.rb`.
+  * This change allows for greater flexibility when using spectre in different environments and projects, ensuring the prompt templates are found regardless of where spectre is used.
+  *	**Example**: If you're using `spectre` inside a gem, the `detect_prompts_path` method will now correctly resolve the prompts path within the gem project root.
+  *	If no markers are found, the system falls back to the current working directory (`Dir.pwd`).
