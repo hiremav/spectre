@@ -9,7 +9,7 @@ module Spectre
       attr_reader :prompts_path
 
       def prompts_path
-        @prompts_path ||= detect_prompts_path
+        @prompts_path = detect_prompts_path
       end
 
       # Render a prompt by reading and rendering the YAML template
@@ -50,7 +50,34 @@ module Spectre
 
       # Detects the appropriate path for prompt templates
       def detect_prompts_path
-        File.join(Dir.pwd, 'app', 'spectre', 'prompts')
+        # Find the first non-spectre, non-ruby core file in the call stack
+        calling_file = caller.find do |path|
+          !path.include?('/spectre/') && !path.include?(RbConfig::CONFIG['rubylibdir'])
+        end
+
+        # Determine the directory from where spectre was invoked
+        start_dir = calling_file ? File.dirname(calling_file) : Dir.pwd
+
+        # Traverse up until we find a Gemfile (or another marker of the project root)
+        project_root = find_project_root(start_dir)
+
+        # Return the prompts path based on the detected project root
+        File.join(project_root, 'app', 'spectre', 'prompts')
+      end
+
+      def find_project_root(dir)
+        while dir != '/' do
+          # Check for Gemfile, .git directory, or config/application.rb (Rails)
+          return dir if File.exist?(File.join(dir, 'Gemfile')) ||
+            File.exist?(File.join(dir, 'config', 'application.rb')) ||
+            File.directory?(File.join(dir, '.git'))
+
+          # Move up one directory
+          dir = File.expand_path('..', dir)
+        end
+
+        # Default fallback if no root markers are found
+        Dir.pwd
       end
 
       # Split the template parameter into path and prompt

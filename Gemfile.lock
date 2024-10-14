@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    spectre_ai (1.1.1)
+    spectre_ai (1.1.2)
 
 GEM
   remote: https://rubygems.org/
