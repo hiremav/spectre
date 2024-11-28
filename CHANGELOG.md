@@ -94,3 +94,12 @@ This version enhances the flexibility and robustness of the Completions class, e
   * This change allows for greater flexibility when using spectre in different environments and projects, ensuring the prompt templates are found regardless of where spectre is used.
   *	**Example**: If you're using `spectre` inside a gem, the `detect_prompts_path` method will now correctly resolve the prompts path within the gem project root.
   *	If no markers are found, the system falls back to the current working directory (`Dir.pwd`).
+
+# Changelog for Version 1.1.3
+
+**Release Date:** [2nd Dec 2024]
+
+**Fixes:**
+
+* **Removed unnecessary validations in `Completions` class**
+  * Removed redundant validations in the `Completions` class that were causing unnecessary errors in specific edge cases. LLM providers returns a proper errors messages now.
