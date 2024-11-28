@@ -72,27 +72,6 @@ module Spectre
         if messages.empty?
           raise ArgumentError, "Messages cannot be empty."
         end
-
-        # Iterate through each message and perform detailed validation.
-        messages.each_with_index do |msg, index|
-          # Check if each message hash contains the required keys: :role and :content.
-          # These keys are necessary for defining the type of message and its content.
-          unless msg.key?(:role) && msg.key?(:content)
-            raise ArgumentError, "Message at index #{index} must contain both :role and :content keys."
-          end
-
-          # Check if the role is one of the allowed values: 'system', 'user', or 'assistant'.
-          # This ensures that each message has a valid role identifier.
-          unless %w[system user assistant].include?(msg[:role])
-            raise ArgumentError, "Invalid role '#{msg[:role]}' at index #{index}. Valid roles are 'system', 'user', 'assistant'."
-          end
-
-          # Check if the content is a non-empty string.
-          # This prevents empty or non-string content, which would be meaningless in a conversation.
-          unless msg[:content].is_a?(String) && !msg[:content].strip.empty?
-            raise ArgumentError, "Content for message at index #{index} must be a non-empty string."
-          end
-        end
       end
 
       # Helper method to generate the request body
