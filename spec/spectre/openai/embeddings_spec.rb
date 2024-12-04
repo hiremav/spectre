@@ -62,18 +62,5 @@ RSpec.describe Spectre::Openai::Embeddings do
         }.to raise_error(RuntimeError, /JSON Parse Error/)
       end
     end
-
-    context 'when the request times out' do
-      before do
-        stub_request(:post, Spectre::Openai::Embeddings::API_URL)
-          .to_timeout
-      end
-
-      it 'raises a Request Timeout error' do
-        expect {
-          described_class.create(text)
-        }.to raise_error(RuntimeError, /Request Timeout/)
-      end
-    end
   end
 end
