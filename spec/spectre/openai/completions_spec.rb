@@ -69,19 +69,6 @@ RSpec.describe Spectre::Openai::Completions do
       end
     end
 
-    context 'when the request times out' do
-      before do
-        stub_request(:post, Spectre::Openai::Completions::API_URL)
-          .to_timeout
-      end
-
-      it 'raises a Request Timeout error' do
-        expect {
-          described_class.create(messages: messages)
-        }.to raise_error(RuntimeError, /Request Timeout/)
-      end
-    end
-
     context 'when the response finish_reason is length' do
       let(:incomplete_response_body) { { choices: [{ message: { content: completion }, finish_reason: 'length' }] }.to_json }
 

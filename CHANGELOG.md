@@ -95,6 +95,7 @@ This version enhances the flexibility and robustness of the Completions class, e
   *	**Example**: If you're using `spectre` inside a gem, the `detect_prompts_path` method will now correctly resolve the prompts path within the gem project root.
   *	If no markers are found, the system falls back to the current working directory (`Dir.pwd`).
 
+
 # Changelog for Version 1.1.3
 
 **Release Date:** [2nd Dec 2024]
@@ -103,3 +104,38 @@ This version enhances the flexibility and robustness of the Completions class, e
 
 * **Removed unnecessary validations in `Completions` class**
   * Removed redundant validations in the `Completions` class that were causing unnecessary errors in specific edge cases. LLM providers returns a proper errors messages now.
+
+
+# Changelog for Version 1.1.4
+
+**Release Date:** [5th Dec 2024]
+
+**New Features:**
+
+* Customizable Timeout for API Requests
+* Introduced DEFAULT_TIMEOUT constant (set to 60 seconds) for managing request timeouts across the Completions and Embeddings classes.
+* Added optional arguments (args) to create methods, allowing users to override read_timeout and open_timeout dynamically.
+* This change ensures greater flexibility when dealing with varying network conditions or API response times.
+
+**Example Usage:**
+
+```ruby
+Spectre::Openai::Completions.create(
+  messages: messages,
+  read_timeout: 30,
+  open_timeout: 20
+)
+```
+
+**Key Changes:**
+
+* **Updated Completions class:**
+  * http.read_timeout = args.fetch(:read_timeout, DEFAULT_TIMEOUT)
+  * http.open_timeout = args.fetch(:open_timeout, DEFAULT_TIMEOUT)
+  * Updated Embeddings class with the same timeout handling logic.
+
+**Fixes:**
+
+* Simplified Exception Handling for Timeouts
+* Removed explicit handling of Net::OpenTimeout and Net::ReadTimeout exceptions in both Completions and Embeddings classes.
+* Letting these exceptions propagate ensures clearer and more consistent error messages for timeout issues.
