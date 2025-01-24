@@ -15,7 +15,7 @@ module Spectre
       #
       # @param text [String] the text input for which embeddings are to be generated
       # @param model [String] the model to be used for generating embeddings, defaults to DEFAULT_MODEL
-      # # @param args [Hash] Optional arguments like timeouts
+      # @param args [Hash] optional arguments like read_timeout and open_timeout
       # @return [Array<Float>] the generated embedding vector
       # @raise [APIKeyNotConfiguredError] if the API key is not set
       # @raise [RuntimeError] for general API errors or unexpected issues
