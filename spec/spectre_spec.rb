@@ -4,15 +4,16 @@ require 'spec_helper'
 require 'spectre'
 
 RSpec.describe Spectre do
-  let(:api_key) { 'test_openai_api_key' }
+  let(:openai_api_key) { 'test_openai_api_key' }
   let(:ollama_host) { 'http://ollama.local' }
+  let(:ollama_api_key) { 'test_ollama_api_key' }
 
   shared_context 'configured openai provider' do
     before do
       Spectre.setup do |config|
         config.llm_provider = :openai
         config.openai do |openai|
-          openai.api_key = api_key
+          openai.api_key = openai_api_key
         end
       end
     end
@@ -24,6 +25,7 @@ RSpec.describe Spectre do
         config.llm_provider = :ollama
         config.ollama do |ollama|
           ollama.host = ollama_host
+          ollama.api_key = ollama_api_key
         end
       end
     end
@@ -42,12 +44,12 @@ RSpec.describe Spectre do
     it 'allows setting the llm_provider and provider-specific configurations' do
       Spectre.setup do |config|
         config.llm_provider = :openai
-        config.openai { |openai| openai.api_key = api_key }
+        config.openai { |openai| openai.api_key = openai_api_key }
         config.ollama { |ollama| ollama.host = ollama_host }
       end
 
       expect(Spectre.config.llm_provider).to eq(:openai)
-      expect(Spectre.config.providers[:openai].api_key).to eq(api_key)
+      expect(Spectre.config.providers[:openai].api_key).to eq(openai_api_key)
       expect(Spectre.config.providers[:ollama].host).to eq(ollama_host)
     end
 
@@ -81,7 +83,7 @@ RSpec.describe Spectre do
 
     it 'returns the current configuration' do
       expect(Spectre.config.llm_provider).to eq(:openai)
-      expect(Spectre.config.providers[:openai].api_key).to eq(api_key)
+      expect(Spectre.config.providers[:openai].api_key).to eq(openai_api_key)
     end
   end
 
@@ -90,7 +92,7 @@ RSpec.describe Spectre do
       include_context 'configured openai provider'
 
       it 'allows setting OpenAI-specific configurations' do
-        expect(Spectre.config.providers[:openai].api_key).to eq(api_key)
+        expect(Spectre.config.providers[:openai].api_key).to eq(openai_api_key)
       end
     end
 
@@ -99,6 +101,7 @@ RSpec.describe Spectre do
 
       it 'allows setting Ollama-specific configurations' do
         expect(Spectre.config.providers[:ollama].host).to eq(ollama_host)
+        expect(Spectre.config.providers[:ollama].api_key).to eq(ollama_api_key)
       end
     end
   end
@@ -116,7 +119,7 @@ RSpec.describe Spectre do
       it 'returns the configuration for the Openai provider' do
         provider_config = Spectre.provider_configuration
         expect(provider_config).to be_a(Spectre::OpenaiConfiguration)
-        expect(provider_config.api_key).to eq(api_key)
+        expect(provider_config.api_key).to eq(openai_api_key)
       end
     end
 
@@ -127,6 +130,7 @@ RSpec.describe Spectre do
         provider_config = Spectre.provider_configuration
         expect(provider_config).to be_a(Spectre::OllamaConfiguration)
         expect(provider_config.host).to eq(ollama_host)
+        expect(provider_config.api_key).to eq(ollama_api_key)
       end
     end
 

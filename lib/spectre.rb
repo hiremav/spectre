@@ -63,7 +63,7 @@ module Spectre
   end
 
   class OllamaConfiguration
-    attr_accessor :host
+    attr_accessor :host, :api_key
   end
 
   class << self
