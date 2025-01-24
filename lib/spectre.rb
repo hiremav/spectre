@@ -7,10 +7,9 @@ require "spectre/openai"
 require "spectre/ollama"
 require "spectre/logging"
 require 'spectre/prompt'
+require 'spectre/errors'
 
 module Spectre
-  class APIKeyNotConfiguredError < StandardError; end
-
   VALID_LLM_PROVIDERS = {
     openai: Spectre::Openai,
     ollama: Spectre::Ollama
