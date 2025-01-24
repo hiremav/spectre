@@ -23,7 +23,7 @@ module Spectre
       # @raise [APIKeyNotConfiguredError] If the API key is not set
       # @raise [RuntimeError] For general API errors or unexpected issues
       def self.create(messages:, model: DEFAULT_MODEL, json_schema: nil, max_tokens: nil, tools: nil, **args)
-        api_key = Spectre.api_key
+        api_key = Spectre.provider_configuration.api_key
         raise APIKeyNotConfiguredError, "API key is not configured" unless api_key
 
         validate_messages!(messages)

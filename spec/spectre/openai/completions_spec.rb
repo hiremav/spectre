@@ -15,13 +15,23 @@ RSpec.describe Spectre::Openai::Completions do
   let(:response_body) { { choices: [{ message: { content: completion }, finish_reason: 'stop' }] }.to_json }
 
   before do
-    allow(Spectre).to receive(:api_key).and_return(api_key)
+    Spectre.setup do |config|
+      config.llm_provider = :openai
+      config.openai do |openai|
+        openai.api_key = api_key
+      end
+    end
   end
 
   describe '.create' do
     context 'when the API key is not configured' do
       before do
-        allow(Spectre).to receive(:api_key).and_return(nil)
+        Spectre.setup do |config|
+          config.llm_provider = :openai
+          config.openai do |openai|
+            openai.api_key = nil
+          end
+        end
       end
 
       it 'raises an APIKeyNotConfiguredError' do
