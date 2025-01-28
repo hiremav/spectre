@@ -117,7 +117,7 @@ module Spectre
         done = response.dig('done')
 
         # Check if the model made a function call
-        if message['tool_calls'].present?
+        if message['tool_calls'] && !message['tool_calls'].empty?
           return { tool_calls: message['tool_calls'], content: message['content'] }
         end
 

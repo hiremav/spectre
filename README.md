@@ -6,14 +6,14 @@
 
 ## Compatibility
 
-| Feature                 | Compatibility |
-|-------------------------|---------------|
-| Foundation Models (LLM) | OpenAI        |
-| Embeddings              | OpenAI        |
-| Vector Searching        | MongoDB Atlas |
-| Prompt Templates        | OpenAI        |
+| Feature                 | Compatibility  |
+|-------------------------|----------------|
+| Foundation Models (LLM) | OpenAI, Ollama |
+| Embeddings              | OpenAI, Ollama |
+| Vector Searching        | MongoDB Atlas  |
+| Prompt Templates        |                |
 
-**💡 Note:** We will first prioritize adding support for additional foundation models (Claude, Cohere, LLaMA, etc.), then look to add support for more vector databases (Pgvector, Pinecone, etc.). If you're looking for something a bit more extensible, we highly recommend checking out [langchainrb](https://github.com/patterns-ai-core/langchainrb).
+**💡 Note:** We will first prioritize adding support for additional foundation models (Claude, Cohere, etc.), then look to add support for more vector databases (Pgvector, Pinecone, etc.). If you're looking for something a bit more extensible, we highly recommend checking out [langchainrb](https://github.com/patterns-ai-core/langchainrb).
 
 ## Installation
 
