@@ -15,17 +15,16 @@ module Spectre
       #
       # @param messages [Array<Hash>] The conversation messages, each with a role and content
       # @param model [String] The model to be used for generating completions, defaults to DEFAULT_MODEL
-      # @param path [String] the API path, defaults to API_PATH
       # @param json_schema [Hash, nil] An optional JSON schema to enforce structured output
-      # @param max_tokens [Integer] The maximum number of tokens for the completion (default: 50)
       # @param tools [Array<Hash>, nil] An optional array of tool definitions for function calling
-      # @param options [Hash, nil] Additional model parameters listed in the documentation for the https://github.com/ollama/ollama/blob/main/docs/modelfile.md#valid-parameters-and-values such as temperature
-      # @param args [Hash, nil] optional arguments like read_timeout and open_timeout
+      # @param args [Hash, nil] optional arguments like read_timeout and open_timeout. You can pass in the ollama hash to specify the path and options.
+      # @param args.ollama.path [String, nil] The path to the Ollama API endpoint, defaults to API_PATH
+      # @param args.ollama.options [Hash, nil] Additional model parameters listed in the documentation for the https://github.com/ollama/ollama/blob/main/docs/modelfile.md#valid-parameters-and-values such as temperature
       # @return [Hash] The parsed response including any function calls or content
       # @raise [HostNotConfiguredError] If the API host is not set in the provider configuration.
       # @raise [APIKeyNotConfiguredError] If the API key is not set
       # @raise [RuntimeError] For general API errors or unexpected issues
-      def self.create(messages:, model: DEFAULT_MODEL, path: API_PATH, json_schema: nil, tools: nil, options: {}, **args)
+      def self.create(messages:, model: DEFAULT_MODEL, json_schema: nil, tools: nil, **args)
         api_host = Spectre.provider_configuration.host
         api_key = Spectre.provider_configuration.api_key
         raise HostNotConfiguredError, "Host is not configured" unless api_host
@@ -33,6 +32,7 @@ module Spectre
 
         validate_messages!(messages)
 
+        path = args.dig(:ollama, :path) || API_PATH
         uri = URI.join(api_host, path)
         http = Net::HTTP.new(uri.host, uri.port)
         http.use_ssl = true if uri.scheme == 'https'
@@ -44,6 +44,7 @@ module Spectre
           'Authorization' => "Bearer #{api_key}"
         })
 
+        options = args.dig(:ollama, :options)
         request.body = generate_body(messages, model, json_schema, tools, options).to_json
         response = http.request(request)
 

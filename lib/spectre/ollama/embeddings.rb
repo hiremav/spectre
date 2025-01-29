@@ -16,20 +16,21 @@ module Spectre
       #
       # @param text [String] the text input for which embeddings are to be generated
       # @param model [String] the model to be used for generating embeddings, defaults to DEFAULT_MODEL
-      # @param path [String] the API path, defaults to API_PATH
-      # @param param_name [String] the parameter key for the text input, defaults to PARAM_NAME
-      # @param args [Hash] optional arguments like read_timeout and open_timeout
+      # @param args [Hash, nil] optional arguments like read_timeout and open_timeout
+      # @param args.ollama.path [String, nil] the API path, defaults to API_PATH
+      # @param args.ollama.param_name [String, nil] the parameter key for the text input, defaults to PARAM_NAME
       # @return [Array<Float>] the generated embedding vector
       # @raise [HostNotConfiguredError] if the host is not set in the configuration
       # @raise [APIKeyNotConfiguredError] if the API key is not set in the configuration
       # @raise [RuntimeError] for API errors or invalid responses
       # @raise [JSON::ParserError] if the response cannot be parsed as JSON
-      def self.create(text, model: DEFAULT_MODEL, path: API_PATH, param_name: PARAM_NAME, **args)
+      def self.create(text, model: DEFAULT_MODEL, **args)
         api_host = Spectre.provider_configuration.host
         api_key = Spectre.provider_configuration.api_key
         raise HostNotConfiguredError, "Host is not configured" unless api_host
         raise APIKeyNotConfiguredError, "API key is not configured" unless api_key
 
+        path = args.dig(:ollama, :path) || API_PATH
         uri = URI.join(api_host, path)
         http = Net::HTTP.new(uri.host, uri.port)
         http.use_ssl = true if uri.scheme == 'https'
@@ -41,6 +42,7 @@ module Spectre
           'Authorization' => "Bearer #{api_key}"
         })
 
+        param_name = args.dig(:ollama, :param_name) || PARAM_NAME
         request.body = { model: model, param_name => text }.to_json
         response = http.request(request)
 

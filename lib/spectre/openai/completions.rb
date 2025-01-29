@@ -16,13 +16,12 @@ module Spectre
       # @param messages [Array<Hash>] The conversation messages, each with a role and content
       # @param model [String] The model to be used for generating completions, defaults to DEFAULT_MODEL
       # @param json_schema [Hash, nil] An optional JSON schema to enforce structured output
-      # @param max_tokens [Integer] The maximum number of tokens for the completion (default: 50)
       # @param tools [Array<Hash>, nil] An optional array of tool definitions for function calling
-      # @param args [Hash] Optional arguments like timeouts
+      # @param args [Hash, nil] optional arguments like read_timeout and open_timeout. For OpenAI, max_tokens can be passed in the openai hash.
       # @return [Hash] The parsed response including any function calls or content
       # @raise [APIKeyNotConfiguredError] If the API key is not set
       # @raise [RuntimeError] For general API errors or unexpected issues
-      def self.create(messages:, model: DEFAULT_MODEL, json_schema: nil, max_tokens: nil, tools: nil, **args)
+      def self.create(messages:, model: DEFAULT_MODEL, json_schema: nil, tools: nil, **args)
         api_key = Spectre.provider_configuration.api_key
         raise APIKeyNotConfiguredError, "API key is not configured" unless api_key
 
@@ -39,6 +38,7 @@ module Spectre
           'Authorization' => "Bearer #{api_key}"
         })
 
+        max_tokens = args.dig(:openai, :max_tokens)
         request.body = generate_body(messages, model, json_schema, max_tokens, tools).to_json
         response = http.request(request)
 

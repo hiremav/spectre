@@ -134,7 +134,7 @@ RSpec.describe Spectre::Openai::Completions do
       end
 
       it 'sends the max_tokens parameter in the request' do
-        described_class.create(messages: messages, max_tokens: max_tokens)
+        described_class.create(messages: messages, openai: { max_tokens: max_tokens })
 
         expect(a_request(:post, Spectre::Openai::Completions::API_URL)
                  .with(body: hash_including(max_tokens: max_tokens))).to have_been_made
