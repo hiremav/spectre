@@ -82,6 +82,14 @@ module Spectre
       config.provider_configuration
     end
 
+    def openai_configuration
+      config.providers[:openai]
+    end
+
+    def ollama_configuration
+      config.providers[:ollama]
+    end
+
     private
 
     def validate_llm_provider!

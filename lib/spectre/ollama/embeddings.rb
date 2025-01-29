@@ -25,8 +25,8 @@ module Spectre
       # @raise [RuntimeError] for API errors or invalid responses
       # @raise [JSON::ParserError] if the response cannot be parsed as JSON
       def self.create(text, model: DEFAULT_MODEL, **args)
-        api_host = Spectre.provider_configuration.host
-        api_key = Spectre.provider_configuration.api_key
+        api_host = Spectre.ollama_configuration.host
+        api_key = Spectre.ollama_configuration.api_key
         raise HostNotConfiguredError, "Host is not configured" unless api_host
         raise APIKeyNotConfiguredError, "API key is not configured" unless api_key
 
