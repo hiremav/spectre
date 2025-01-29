@@ -11,7 +11,7 @@ RSpec.describe Spectre::Ollama::Embeddings do
 
   before do
     Spectre.setup do |config|
-      config.llm_provider = :ollama
+      config.default_llm_provider = :ollama
       config.ollama do |ollama|
         ollama.api_key = api_key
         ollama.host = host
@@ -23,7 +23,7 @@ RSpec.describe Spectre::Ollama::Embeddings do
     context 'when the host is not configured' do
       before do
         Spectre.setup do |config|
-          config.llm_provider = :ollama
+          config.default_llm_provider = :ollama
           config.ollama do |ollama|
             ollama.api_key = api_key
             ollama.host = nil
@@ -41,7 +41,7 @@ RSpec.describe Spectre::Ollama::Embeddings do
     context 'when the API key is not configured' do
       before do
         Spectre.setup do |config|
-          config.llm_provider = :ollama
+          config.default_llm_provider = :ollama
           config.ollama do |ollama|
             ollama.api_key = nil
             ollama.host = host

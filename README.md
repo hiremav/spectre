@@ -49,7 +49,7 @@ This will create a file at `config/initializers/spectre.rb`, where you can set y
 
 ```ruby
 Spectre.setup do |config|
-  config.llm_provider = :openai
+  config.default_llm_provider = :openai
 
   config.openai do |openai|
     openai.api_key = ENV['OPENAI_API_KEY']

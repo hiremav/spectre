@@ -15,7 +15,7 @@ RSpec.describe Spectre::Ollama::Completions do
 
   before do
     Spectre.setup do |config|
-      config.llm_provider = :ollama
+      config.default_llm_provider = :ollama
       config.ollama do |ollama|
         ollama.api_key = api_key
         ollama.host = api_host
@@ -27,7 +27,7 @@ RSpec.describe Spectre::Ollama::Completions do
     context 'when the API key is not configured' do
       before do
         Spectre.setup do |config|
-          config.llm_provider = :ollama
+          config.default_llm_provider = :ollama
           config.ollama do |ollama|
             ollama.api_key = nil
           end
@@ -44,7 +44,7 @@ RSpec.describe Spectre::Ollama::Completions do
     context 'when the host is not configured' do
       before do
         Spectre.setup do |config|
-          config.llm_provider = :ollama
+          config.default_llm_provider = :ollama
           config.ollama do |ollama|
             ollama.api_key = api_key
             ollama.host = nil # Host is not configured

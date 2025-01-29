@@ -10,7 +10,7 @@ RSpec.describe Spectre::Openai::Embeddings do
 
   before do
     Spectre.setup do |config|
-      config.llm_provider = :openai
+      config.default_llm_provider = :openai
       config.openai do |openai|
         openai.api_key = api_key
       end
@@ -21,7 +21,7 @@ RSpec.describe Spectre::Openai::Embeddings do
     context 'when the API key is not configured' do
       before do
         Spectre.setup do |config|
-          config.llm_provider = :openai
+          config.default_llm_provider = :openai
           config.openai do |openai|
             openai.api_key = nil
           end

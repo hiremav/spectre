@@ -11,7 +11,7 @@ RSpec.describe Spectre do
   shared_context 'configured openai provider' do
     before do
       Spectre.setup do |config|
-        config.llm_provider = :openai
+        config.default_llm_provider = :openai
         config.openai do |openai|
           openai.api_key = openai_api_key
         end
@@ -22,7 +22,7 @@ RSpec.describe Spectre do
   shared_context 'configured ollama provider' do
     before do
       Spectre.setup do |config|
-        config.llm_provider = :ollama
+        config.default_llm_provider = :ollama
         config.ollama do |ollama|
           ollama.host = ollama_host
           ollama.api_key = ollama_api_key
@@ -36,29 +36,29 @@ RSpec.describe Spectre do
       yielded = false
       Spectre.setup do |config|
         yielded = true
-        config.llm_provider = :openai
+        config.default_llm_provider = :openai
       end
       expect(yielded).to be true
     end
 
-    it 'allows setting the llm_provider and provider-specific configurations' do
+    it 'allows setting the default_llm_provider and provider-specific configurations' do
       Spectre.setup do |config|
-        config.llm_provider = :openai
+        config.default_llm_provider = :openai
         config.openai { |openai| openai.api_key = openai_api_key }
         config.ollama { |ollama| ollama.host = ollama_host }
       end
 
-      expect(Spectre.config.llm_provider).to eq(:openai)
+      expect(Spectre.config.default_llm_provider).to eq(:openai)
       expect(Spectre.config.providers[:openai].api_key).to eq(openai_api_key)
       expect(Spectre.config.providers[:ollama].host).to eq(ollama_host)
     end
 
-    it 'raises an error for an invalid llm_provider' do
+    it 'raises an error for an invalid default_llm_provider' do
       expect {
         Spectre.setup do |config|
-          config.llm_provider = :invalid_provider
+          config.default_llm_provider = :invalid_provider
         end
-      }.to raise_error(ArgumentError, /Invalid llm_provider: invalid_provider/)
+      }.to raise_error(ArgumentError, /Invalid default_llm_provider: invalid_provider/)
     end
   end
 
@@ -70,7 +70,7 @@ RSpec.describe Spectre do
     end
 
     it 'raises an error for an unsupported provider' do
-      allow(Spectre).to receive(:config).and_return(double(llm_provider: :unsupported_provider))
+      allow(Spectre).to receive(:config).and_return(double(default_llm_provider: :unsupported_provider))
 
       expect {
         Spectre.provider_module
@@ -82,7 +82,7 @@ RSpec.describe Spectre do
     include_context 'configured openai provider'
 
     it 'returns the current configuration' do
-      expect(Spectre.config.llm_provider).to eq(:openai)
+      expect(Spectre.config.default_llm_provider).to eq(:openai)
       expect(Spectre.config.providers[:openai].api_key).to eq(openai_api_key)
     end
   end
@@ -137,7 +137,7 @@ RSpec.describe Spectre do
     context 'when no configuration exists for the current provider' do
       before do
         Spectre.setup do |config|
-          config.llm_provider = :openai
+          config.default_llm_provider = :openai
         end
         Spectre.config.providers.delete(:openai) # Simulate missing configuration
       end

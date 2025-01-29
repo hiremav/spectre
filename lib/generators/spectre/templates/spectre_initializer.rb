@@ -4,7 +4,7 @@ require 'spectre'
 
 Spectre.setup do |config|
   # Chose your LLM (openai, ollama)
-  config.llm_provider = :openai
+  config.default_llm_provider = :openai
 
   config.openai do |openai|
     openai.api_key = ENV['OPENAI_API_KEY']

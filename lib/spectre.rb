@@ -36,7 +36,7 @@ module Spectre
   end
 
   class Configuration
-    attr_accessor :llm_provider, :providers
+    attr_accessor :default_llm_provider, :providers
 
     def initialize
       @providers = {}
@@ -53,7 +53,7 @@ module Spectre
     end
 
     def provider_configuration
-      providers[llm_provider] || raise("No configuration found for provider: #{llm_provider}")
+      providers[default_llm_provider] || raise("No configuration found for provider: #{default_llm_provider}")
     end
   end
 
@@ -75,7 +75,7 @@ module Spectre
     end
 
     def provider_module
-      VALID_LLM_PROVIDERS[config.llm_provider] || raise("LLM provider #{config.llm_provider} not supported")
+      VALID_LLM_PROVIDERS[config.default_llm_provider] || raise("LLM provider #{config.default_llm_provider} not supported")
     end
 
     def provider_configuration
@@ -85,8 +85,8 @@ module Spectre
     private
 
     def validate_llm_provider!
-      unless VALID_LLM_PROVIDERS.keys.include?(config.llm_provider)
-        raise ArgumentError, "Invalid llm_provider: #{config.llm_provider}. Must be one of: #{VALID_LLM_PROVIDERS.keys.join(', ')}"
+      unless VALID_LLM_PROVIDERS.keys.include?(config.default_llm_provider)
+        raise ArgumentError, "Invalid default_llm_provider: #{config.default_llm_provider}. Must be one of: #{VALID_LLM_PROVIDERS.keys.join(', ')}"
       end
     end
   end
