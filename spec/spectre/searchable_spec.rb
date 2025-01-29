@@ -10,7 +10,7 @@ RSpec.describe Spectre::Searchable do
     TestModel.create!(field1: 'Machine Learning', field2: 'AI in ML')
 
     Spectre.setup do |config|
-      config.llm_provider = :openai
+      config.default_llm_provider = :openai
     end
 
     allow(Spectre::Openai::Embeddings).to receive(:create).and_return([0.1, 0.2, 0.3])

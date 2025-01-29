@@ -5,10 +5,10 @@ require 'json'
 require 'uri'
 
 module Spectre
-  module Openai
+  module Ollama
     class Completions
-      API_URL = 'https://api.openai.com/v1/chat/completions'
-      DEFAULT_MODEL = 'gpt-4o-mini'
+      API_PATH = 'api/chat'
+      DEFAULT_MODEL = 'llama3.1:8b'
       DEFAULT_TIMEOUT = 60
 
       # Class method to generate a completion based on user messages and optional tools
@@ -17,19 +17,25 @@ module Spectre
       # @param model [String] The model to be used for generating completions, defaults to DEFAULT_MODEL
       # @param json_schema [Hash, nil] An optional JSON schema to enforce structured output
       # @param tools [Array<Hash>, nil] An optional array of tool definitions for function calling
-      # @param args [Hash, nil] optional arguments like read_timeout and open_timeout. For OpenAI, max_tokens can be passed in the openai hash.
+      # @param args [Hash, nil] optional arguments like read_timeout and open_timeout. You can pass in the ollama hash to specify the path and options.
+      # @param args.ollama.path [String, nil] The path to the Ollama API endpoint, defaults to API_PATH
+      # @param args.ollama.options [Hash, nil] Additional model parameters listed in the documentation for the https://github.com/ollama/ollama/blob/main/docs/modelfile.md#valid-parameters-and-values such as temperature
       # @return [Hash] The parsed response including any function calls or content
+      # @raise [HostNotConfiguredError] If the API host is not set in the provider configuration.
       # @raise [APIKeyNotConfiguredError] If the API key is not set
       # @raise [RuntimeError] For general API errors or unexpected issues
       def self.create(messages:, model: DEFAULT_MODEL, json_schema: nil, tools: nil, **args)
-        api_key = Spectre.openai_configuration.api_key
+        api_host = Spectre.ollama_configuration.host
+        api_key = Spectre.ollama_configuration.api_key
+        raise HostNotConfiguredError, "Host is not configured" unless api_host
         raise APIKeyNotConfiguredError, "API key is not configured" unless api_key
 
         validate_messages!(messages)
 
-        uri = URI(API_URL)
+        path = args.dig(:ollama, :path) || API_PATH
+        uri = URI.join(api_host, path)
         http = Net::HTTP.new(uri.host, uri.port)
-        http.use_ssl = true
+        http.use_ssl = true if uri.scheme == 'https'
         http.read_timeout = args.fetch(:read_timeout, DEFAULT_TIMEOUT)
         http.open_timeout = args.fetch(:open_timeout, DEFAULT_TIMEOUT)
 
@@ -38,12 +44,12 @@ module Spectre
           'Authorization' => "Bearer #{api_key}"
         })
 
-        max_tokens = args.dig(:openai, :max_tokens)
-        request.body = generate_body(messages, model, json_schema, max_tokens, tools).to_json
+        options = args.dig(:ollama, :options)
+        request.body = generate_body(messages, model, json_schema, tools, options).to_json
         response = http.request(request)
 
         unless response.is_a?(Net::HTTPSuccess)
-          raise "OpenAI API Error: #{response.code} - #{response.message}: #{response.body}"
+          raise "Ollama API Error: #{response.code} - #{response.message}: #{response.body}"
         end
 
         parsed_response = JSON.parse(response.body)
@@ -79,18 +85,25 @@ module Spectre
       # @param messages [Array<Hash>] The conversation messages, each with a role and content
       # @param model [String] The model to be used for generating completions
       # @param json_schema [Hash, nil] An optional JSON schema to enforce structured output
-      # @param max_tokens [Integer, nil] The maximum number of tokens for the completion
       # @param tools [Array<Hash>, nil] An optional array of tool definitions for function calling
+      # @param options [Hash, nil] Additional model parameters listed in the documentation for the https://github.com/ollama/ollama/blob/main/docs/modelfile.md#valid-parameters-and-values such as temperature
       # @return [Hash] The body for the API request
-      def self.generate_body(messages, model, json_schema, max_tokens, tools)
+      def self.generate_body(messages, model, json_schema, tools, options)
         body = {
           model: model,
+          stream: false,
           messages: messages
         }
 
-        body[:max_tokens] = max_tokens if max_tokens
-        body[:response_format] = { type: 'json_schema', json_schema: json_schema } if json_schema
+        # Extract schema if json_schema follows OpenAI's structure
+        if json_schema.is_a?(Hash) && json_schema.key?(:schema)
+          body[:format] = json_schema[:schema] # Use only the "schema" key
+        elsif json_schema.is_a?(Hash)
+          body[:format] = json_schema # Use the schema as-is if it doesn't follow OpenAI's structure
+        end
+
         body[:tools] = tools if tools # Add the tools to the request body if provided
+        body[:options] = options if options
 
         body
       end
@@ -100,36 +113,22 @@ module Spectre
       # @param response [Hash] The parsed API response
       # @return [Hash] The relevant data based on the finish reason
       def self.handle_response(response)
-        message = response.dig('choices', 0, 'message')
-        finish_reason = response.dig('choices', 0, 'finish_reason')
-
-        # Check if the response contains a refusal
-        if message['refusal']
-          raise "Refusal: #{message['refusal']}"
-        end
-
-        # Check if the finish reason is "length", indicating incomplete response
-        if finish_reason == "length"
-          raise "Incomplete response: The completion was cut off due to token limit."
-        end
-
-        # Check if the finish reason is "content_filter", indicating policy violations
-        if finish_reason == "content_filter"
-          raise "Content filtered: The model's output was blocked due to policy violations."
-        end
+        message = response.dig('message')
+        finish_reason = response.dig('done_reason')
+        done = response.dig('done')
 
         # Check if the model made a function call
-        if finish_reason == "function_call" || finish_reason == "tool_calls"
+        if message['tool_calls'] && !message['tool_calls'].empty?
           return { tool_calls: message['tool_calls'], content: message['content'] }
         end
 
         # If the response finished normally, return the content
-        if finish_reason == "stop"
+        if done
           return { content: message['content'] }
         end
 
         # Handle unexpected finish reasons
-        raise "Unexpected finish_reason: #{finish_reason}"
+        raise "Unexpected finish_reason: #{finish_reason}, done: #{done}, message: #{message}"
       end
     end
   end

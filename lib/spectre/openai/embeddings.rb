@@ -15,12 +15,12 @@ module Spectre
       #
       # @param text [String] the text input for which embeddings are to be generated
       # @param model [String] the model to be used for generating embeddings, defaults to DEFAULT_MODEL
-      # # @param args [Hash] Optional arguments like timeouts
+      # @param args [Hash] optional arguments like read_timeout and open_timeout
       # @return [Array<Float>] the generated embedding vector
       # @raise [APIKeyNotConfiguredError] if the API key is not set
       # @raise [RuntimeError] for general API errors or unexpected issues
       def self.create(text, model: DEFAULT_MODEL, **args)
-        api_key = Spectre.api_key
+        api_key = Spectre.openai_configuration.api_key
         raise APIKeyNotConfiguredError, "API key is not configured" unless api_key
 
         uri = URI(API_URL)

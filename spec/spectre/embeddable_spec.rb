@@ -9,7 +9,7 @@ RSpec.describe Spectre::Embeddable do
     TestModel.clear_all
     TestModel.embeddable_field :field1, :field2
     Spectre.setup do |config|
-      config.llm_provider = :openai
+      config.default_llm_provider = :openai
     end
   end
 

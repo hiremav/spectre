@@ -15,13 +15,23 @@ RSpec.describe Spectre::Openai::Completions do
   let(:response_body) { { choices: [{ message: { content: completion }, finish_reason: 'stop' }] }.to_json }
 
   before do
-    allow(Spectre).to receive(:api_key).and_return(api_key)
+    Spectre.setup do |config|
+      config.default_llm_provider = :openai
+      config.openai do |openai|
+        openai.api_key = api_key
+      end
+    end
   end
 
   describe '.create' do
     context 'when the API key is not configured' do
       before do
-        allow(Spectre).to receive(:api_key).and_return(nil)
+        Spectre.setup do |config|
+          config.default_llm_provider = :openai
+          config.openai do |openai|
+            openai.api_key = nil
+          end
+        end
       end
 
       it 'raises an APIKeyNotConfiguredError' do
@@ -124,7 +134,7 @@ RSpec.describe Spectre::Openai::Completions do
       end
 
       it 'sends the max_tokens parameter in the request' do
-        described_class.create(messages: messages, max_tokens: max_tokens)
+        described_class.create(messages: messages, openai: { max_tokens: max_tokens })
 
         expect(a_request(:post, Spectre::Openai::Completions::API_URL)
                  .with(body: hash_including(max_tokens: max_tokens))).to have_been_made
