@@ -139,3 +139,62 @@ Spectre::Openai::Completions.create(
 * Simplified Exception Handling for Timeouts
 * Removed explicit handling of Net::OpenTimeout and Net::ReadTimeout exceptions in both Completions and Embeddings classes.
 * Letting these exceptions propagate ensures clearer and more consistent error messages for timeout issues.
+
+
+# Changelog for Version 1.2.0
+
+**Release Date:** [30th Jan 2025]
+
+### **New Features & Enhancements**
+
+1️⃣ **Unified Configuration for LLM Providers**
+
+🔧 Refactored the configuration system to provide a consistent interface for setting up OpenAI and Ollama within config/initializers/spectre.rb.\
+•	Now, developers can seamlessly switch between OpenAI and Ollama by defining a single provider configuration block.\
+•	Ensures better modularity and simplifies adding support for future providers (Claude, Cohere, etc.).
+
+🔑 **Example Configuration:**
+
+```ruby
+Spectre.setup do |config|
+  config.llm_provider = :openai
+
+  config.openai do |openai|
+    openai.api_key = ENV['OPENAI_API_KEY']
+  end
+
+  config.ollama do |ollama|
+    ollama.host = ENV['OLLAMA_HOST']
+    ollama.api_key = ENV['OLLAMA_API_KEY']
+  end
+end
+```
+
+Key Improvements:\
+✅ API key validation added: Now properly checks if api_key is missing and raises APIKeyNotConfiguredError.\
+✅ Host validation added: Now checks if host is missing for Ollama and raises HostNotConfiguredError.
+
+2️⃣ **Added Ollama Provider Support**
+
+🆕 Introduced full support for Ollama, allowing users to use local LLM models efficiently.\
+•	Supports Ollama-based completions for generating text using local models like llama3.\
+•	Supports Ollama-based embeddings for generating embeddings using local models like nomic-embed-text.\
+•	Automatic JSON Schema Conversion: OpenAI’s json_schema format is now automatically translated into Ollama’s format key.
+
+3️⃣ **Differences in OpenAI Interface: max_tokens Moved to `**args`**
+
+💡 Refactored the OpenAI completions request so that max_tokens is now passed as a dynamic argument inside `**args` instead of a separate parameter.\
+•	Why? To ensure a consistent interface across different providers, making it easier to switch between them seamlessly.\
+•	Before:
+```ruby
+Spectre.provider_module::Completions.create(messages: messages, max_tokens: 50)
+```
+•	After:
+```ruby
+Spectre.provider_module::Completions.create(messages: messages, openai: { max_tokens: 50 })
+```
+
+Key Benefits:\
+✅ Keeps the method signature cleaner and future-proof.\
+✅ Ensures optional parameters are handled dynamically without cluttering the main method signature.\
+✅ Improves consistency across OpenAI and Ollama providers.
