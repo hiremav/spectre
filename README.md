@@ -11,7 +11,7 @@
 | Foundation Models (LLM) | OpenAI, Ollama |
 | Embeddings              | OpenAI, Ollama |
 | Vector Searching        | MongoDB Atlas  |
-| Prompt Templates        |                |
+| Prompt Templates        | ✅            |
 
 **💡 Note:** We will first prioritize adding support for additional foundation models (Claude, Cohere, etc.), then look to add support for more vector databases (Pgvector, Pinecone, etc.). If you're looking for something a bit more extensible, we highly recommend checking out [langchainrb](https://github.com/patterns-ai-core/langchainrb).
 
@@ -37,24 +37,32 @@ gem install spectre_ai
 
 ## Usage
 
-### 1. Setup
+### 🔧 Configuration
 
-First, you’ll need to generate the initializer to configure your OpenAI API key. Run the following command to create the initializer:
+First, you’ll need to generate the initializer. Run the following command to create the initializer:
 
 ```bash
 rails generate spectre:install
 ```
 
-This will create a file at `config/initializers/spectre.rb`, where you can set your OpenAI API key:
+This will create a file at `config/initializers/spectre.rb`, where you can set your llm provider and configure the provider-specific settings.
 
 ```ruby
 Spectre.setup do |config|
-  config.api_key = 'your_openai_api_key'
   config.llm_provider = :openai
+
+  config.openai do |openai|
+    openai.api_key = ENV['OPENAI_API_KEY']
+  end
+
+  config.ollama do |ollama|
+    ollama.host = ENV['OLLAMA_HOST']
+    ollama.api_key = ENV['OLLAMA_API_KEY']
+  end
 end
 ```
 
-### 2. Enable Your Rails Model(s)
+### 📡 Embeddings & Vector Search
 
 #### For Embedding
 
@@ -146,6 +154,8 @@ This method sends the text to OpenAI’s API and returns the embedding vector. Y
 Spectre.provider_module::Embeddings.create("Your text here", model: "text-embedding-ada-002")
 ```
 
+**NOTE:** Different providers have different available args for the `create` method. Please refer to the provider-specific documentation for more details.
+
 ### 4. Performing Vector-Based Searches
 
 Once your model is configured as searchable, you can perform vector-based searches on the stored embeddings:
@@ -168,7 +178,7 @@ This method will:
 - **custom_result_fields:** Limit the fields returned in the search results.
 - **additional_scopes:** Apply additional MongoDB filters to the search results.
 
-### 5. Creating Completions
+### 💬 Chat Completions
 
 Spectre provides an interface to create chat completions using your configured LLM provider, allowing you to create dynamic responses, messages, or other forms of text.
 
@@ -182,17 +192,14 @@ messages = [
         { role: 'user', content: "Tell me a joke." }
 ]
 
-Spectre.provider_module::Completions.create(
-        messages: messages
-)
-
+Spectre.provider_module::Completions.create(messages: messages)
 ```
 
 This sends the request to the LLM provider’s API and returns the chat completion.
 
 **Customizing the Completion**
 
-You can customize the behavior by specifying additional parameters such as the model, maximum number of tokens, and any tools needed for function calls:
+You can customize the behavior by specifying additional parameters such as the model, any tools needed for function calls:
 
 ```ruby
 messages = [
@@ -204,7 +211,7 @@ messages = [
 Spectre.provider_module::Completions.create(
         messages: messages,
         model: "gpt-4",
-        max_tokens: 50
+        openai: { max_tokens: 50 }
 )
 
 ```
@@ -241,7 +248,10 @@ Spectre.provider_module::Completions.create(
 
 This structured format guarantees that the response adheres to the schema you’ve provided, ensuring more predictable and controlled results.
 
-**Using Tools for Function Calling**
+**NOTE:** The JSON schema is different for each provider. OpenAI uses [JSON Schema](https://json-schema.org/overview/what-is-jsonschema.html), where you can specify the name of schema and schema itself. Ollama uses just plain JSON object. 
+But you can provide OpenAI's schema to Ollama as well. We just convert it to Ollama's format.
+
+⚙️ Function Calling (Tool Use)
 
 You can incorporate tools (function calls) in your completion to handle more complex interactions such as fetching external information via API or performing calculations. Define tools using the function call format and include them in the request:
 
@@ -321,7 +331,9 @@ else
 end
 ```
 
-### 6. Creating Dynamic Prompts
+**NOTE:** Completions class also supports different `**args` for different providers. Please refer to the provider-specific documentation for more details.
+
+### 🎭 Dynamic Prompt Rendering
 
 Spectre provides a system for creating dynamic prompts based on templates. You can define reusable prompt templates and render them with different parameters in your Rails app (think Ruby on Rails view partials).
 
@@ -424,7 +436,7 @@ Spectre.provider_module::Completions.create(
 
 ```
 
-## Contributing
+## 📜 Contributing
 
 Bug reports and pull requests are welcome on GitHub at [https://github.com/hiremav/spectre](https://github.com/hiremav/spectre). This project is intended to be a safe, welcoming space for collaboration, and your contributions are greatly appreciated!
 
@@ -434,6 +446,6 @@ Bug reports and pull requests are welcome on GitHub at [https://github.com/hirem
 4. **Push** the branch (`git push origin my-new-feature`).
 5. **Create** a pull request.
 
-## License
+## 📜 License
 
 This gem is available as open source under the terms of the MIT License.
