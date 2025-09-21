@@ -6,14 +6,14 @@
 
 ## Compatibility
 
-| Feature                 | Compatibility  |
-|-------------------------|----------------|
-| Foundation Models (LLM) | OpenAI, Ollama |
-| Embeddings              | OpenAI, Ollama |
-| Vector Searching        | MongoDB Atlas  |
-| Prompt Templates        | ✅            |
+| Feature                 | Compatibility          |
+|-------------------------|------------------------|
+| Foundation Models (LLM) | OpenAI, Ollama, Claude |
+| Embeddings              | OpenAI, Ollama         |
+| Vector Searching        | MongoDB Atlas          |
+| Prompt Templates        | ✅                      |
 
-**💡 Note:** We will first prioritize adding support for additional foundation models (Claude, Cohere, etc.), then look to add support for more vector databases (Pgvector, Pinecone, etc.). If you're looking for something a bit more extensible, we highly recommend checking out [langchainrb](https://github.com/patterns-ai-core/langchainrb).
+**💡 Note:** We now support OpenAI, Ollama, and Claude. Next, we'll add support for additional providers (e.g., Cohere) and more vector databases (Pgvector, Pinecone, etc.). If you're looking for something a bit more extensible, we highly recommend checking out [langchainrb](https://github.com/patterns-ai-core/langchainrb).
 
 ## Installation
 
@@ -49,7 +49,7 @@ This will create a file at `config/initializers/spectre.rb`, where you can set y
 
 ```ruby
 Spectre.setup do |config|
-  config.default_llm_provider = :openai
+  config.default_llm_provider = :openai # or :claude, :ollama
 
   config.openai do |openai|
     openai.api_key = ENV['OPENAI_API_KEY']
@@ -58,6 +58,10 @@ Spectre.setup do |config|
   config.ollama do |ollama|
     ollama.host = ENV['OLLAMA_HOST']
     ollama.api_key = ENV['OLLAMA_API_KEY']
+  end
+
+  config.claude do |claude|
+    claude.api_key = ENV['ANTHROPIC_API_KEY']
   end
 end
 ```
@@ -248,8 +252,54 @@ Spectre.provider_module::Completions.create(
 
 This structured format guarantees that the response adheres to the schema you’ve provided, ensuring more predictable and controlled results.
 
-**NOTE:** The JSON schema is different for each provider. OpenAI uses [JSON Schema](https://json-schema.org/overview/what-is-jsonschema.html), where you can specify the name of schema and schema itself. Ollama uses just plain JSON object. 
-But you can provide OpenAI's schema to Ollama as well. We just convert it to Ollama's format.
+**NOTE:** Provider differences for structured output:
+- OpenAI: supports strict JSON Schema via `response_format.json_schema` (see JSON Schema docs: https://json-schema.org/overview/what-is-jsonschema.html).
+- Claude (Anthropic): does not use `response_format`. Spectre converts your `json_schema` into a single "virtual" tool with `input_schema` and, by default, forces its use via `tool_choice` (you can override `tool_choice` explicitly). When the reply consists only of that `tool_use`, Spectre returns the parsed object in `:content` (Hash/Array), not a JSON string.
+- Ollama: expects a plain JSON object in `format`. Spectre will convert OpenAI-style `{ name:, schema: }` automatically into the format Ollama expects.
+
+#### Claude (Anthropic) specifics
+
+- Configure:
+```ruby
+Spectre.setup do |config|
+  config.default_llm_provider = :claude
+  config.claude { |c| c.api_key = ENV['ANTHROPIC_API_KEY'] }
+end
+```
+
+- Structured output with a schema:
+```ruby
+json_schema = {
+  name: "completion_response",
+  schema: {
+    type: "object",
+    properties: { response: { type: "string" } },
+    required: ["response"],
+    additionalProperties: false
+  }
+}
+
+messages = [
+  { role: 'system', content: 'You are a helpful assistant.' },
+  { role: 'user', content: 'Say hello' }
+]
+
+result = Spectre.provider_module::Completions.create(
+  messages: messages,
+  json_schema: json_schema,
+  claude: { max_tokens: 256 }
+)
+
+# When only the schema tool is used, Spectre returns a parsed object:
+result[:content] # => { 'response' => 'Hello!' }
+```
+
+- Optional: override tool selection
+```ruby
+Spectre.provider_module::Completions.create(messages: messages, json_schema: json_schema, tool_choice: { type: 'auto' })
+```
+
+- Note: Claude embeddings are not implemented (no native embeddings model).
 
 ⚙️ Function Calling (Tool Use)
 
