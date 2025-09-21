@@ -247,3 +247,36 @@ Key Benefits:\
 - Claude embeddings are not implemented (no native embeddings model).
 - Behavior change (Claude only): when `json_schema` is used, `:content` returns a parsed object (not a JSON string). If you relied on a string, wrap with `JSON.generate` on the caller side.
 
+
+
+# Changelog for Version 1.4.0
+
+**Release Date:** [21st Sep 2025]
+
+### New Provider: Gemini (Google)
+
+- Added Spectre::Gemini client for chat completions using Google’s OpenAI-compatible endpoint.
+- Added Spectre::Gemini embeddings using Google’s OpenAI-compatible endpoint.
+- New configuration block:
+  ```ruby
+  Spectre.setup do |c|
+    c.default_llm_provider = :gemini
+    c.gemini { |v| v.api_key = ENV['GEMINI_API_KEY'] }
+  end
+  ```
+- Supports `gemini: { max_tokens: ... }` in args to control max tokens for completions.
+- `json_schema` and `tools` are passed through in OpenAI-compatible format.
+
+### Core Wiring
+
+- Added `:gemini` to VALID_LLM_PROVIDERS and provider configuration accessors.
+- Updated Rails generator initializer template to include a gemini block.
+
+### Docs & Tests
+
+- Updated README to include Gemini in compatibility matrix and configuration example.
+- Added RSpec tests for Gemini completions and embeddings (mirroring OpenAI behavior and error handling).
+
+### Behavior Notes
+
+- Gemini OpenAI-compatible chat endpoint requires that the last message in `messages` has role 'user'. Spectre raises an ArgumentError if this requirement is not met to prevent 400 INVALID_ARGUMENT errors from the API.

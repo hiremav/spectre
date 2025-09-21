@@ -8,12 +8,12 @@
 
 | Feature                 | Compatibility          |
 |-------------------------|------------------------|
-| Foundation Models (LLM) | OpenAI, Ollama, Claude |
-| Embeddings              | OpenAI, Ollama         |
+| Foundation Models (LLM) | OpenAI, Ollama, Claude, Gemini |
+| Embeddings              | OpenAI, Ollama, Gemini         |
 | Vector Searching        | MongoDB Atlas          |
 | Prompt Templates        | ✅                      |
 
-**💡 Note:** We now support OpenAI, Ollama, and Claude. Next, we'll add support for additional providers (e.g., Cohere) and more vector databases (Pgvector, Pinecone, etc.). If you're looking for something a bit more extensible, we highly recommend checking out [langchainrb](https://github.com/patterns-ai-core/langchainrb).
+**💡 Note:** We now support OpenAI, Ollama, Claude, and Gemini. Next, we'll add support for additional providers (e.g., Cohere) and more vector databases (Pgvector, Pinecone, etc.). If you're looking for something a bit more extensible, we highly recommend checking out [langchainrb](https://github.com/patterns-ai-core/langchainrb).
 
 ## Installation
 
@@ -49,7 +49,7 @@ This will create a file at `config/initializers/spectre.rb`, where you can set y
 
 ```ruby
 Spectre.setup do |config|
-  config.default_llm_provider = :openai # or :claude, :ollama
+  config.default_llm_provider = :openai # or :claude, :ollama, :gemini
 
   config.openai do |openai|
     openai.api_key = ENV['OPENAI_API_KEY']
@@ -62,6 +62,10 @@ Spectre.setup do |config|
 
   config.claude do |claude|
     claude.api_key = ENV['ANTHROPIC_API_KEY']
+  end
+
+  config.gemini do |gemini|
+    gemini.api_key = ENV['GEMINI_API_KEY']
   end
 end
 ```
@@ -300,6 +304,28 @@ Spectre.provider_module::Completions.create(messages: messages, json_schema: jso
 ```
 
 - Note: Claude embeddings are not implemented (no native embeddings model).
+
+#### Gemini (Google) specifics
+
+- Chat completions use Google's OpenAI-compatible endpoint. Important: the messages array must end with a user message. If the last message is assistant/system or missing, the API returns 400 INVALID_ARGUMENT (e.g., "Please ensure that single turn requests end with a user role or the role field is empty."). Spectre validates this and raises an ArgumentError earlier to help you fix the history before making an API call.
+- Example:
+
+```ruby
+# Incorrect (ends with assistant)
+messages = [
+  { role: 'system', content: 'You are a funny assistant.' },
+  { role: 'user', content: 'Tell me a joke.' },
+  { role: 'assistant', content: "Sure, here's a joke!" }
+]
+
+# Correct (ends with user)
+messages = [
+  { role: 'system', content: 'You are a funny assistant.' },
+  { role: 'user', content: 'Tell me a joke.' },
+  { role: 'assistant', content: "Sure, here's a joke!" },
+  { role: 'user', content: 'Tell me another one.' }
+]
+```
 
 ⚙️ Function Calling (Tool Use)
 

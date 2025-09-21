@@ -6,6 +6,7 @@ require 'spectre/searchable'
 require "spectre/openai"
 require "spectre/ollama"
 require "spectre/claude"
+require "spectre/gemini"
 require "spectre/logging"
 require 'spectre/prompt'
 require 'spectre/errors'
@@ -14,7 +15,8 @@ module Spectre
   VALID_LLM_PROVIDERS = {
     openai: Spectre::Openai,
     ollama: Spectre::Ollama,
-    claude: Spectre::Claude
+    claude: Spectre::Claude,
+    gemini: Spectre::Gemini
     # cohere: Spectre::Cohere,
   }.freeze
 
@@ -59,6 +61,11 @@ module Spectre
       yield @providers[:claude] if block_given?
     end
 
+    def gemini
+      @providers[:gemini] ||= GeminiConfiguration.new
+      yield @providers[:gemini] if block_given?
+    end
+
     def provider_configuration
       providers[default_llm_provider] || raise("No configuration found for provider: #{default_llm_provider}")
     end
@@ -73,6 +80,10 @@ module Spectre
   end
 
   class ClaudeConfiguration
+    attr_accessor :api_key
+  end
+
+  class GeminiConfiguration
     attr_accessor :api_key
   end
 
@@ -103,6 +114,10 @@ module Spectre
 
     def claude_configuration
       config.providers[:claude]
+    end
+
+    def gemini_configuration
+      config.providers[:gemini]
     end
 
     private
