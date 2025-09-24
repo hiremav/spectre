@@ -198,3 +198,85 @@ Key Benefits:\
 ✅ Keeps the method signature cleaner and future-proof.\
 ✅ Ensures optional parameters are handled dynamically without cluttering the main method signature.\
 ✅ Improves consistency across OpenAI and Ollama providers.
+
+
+# Changelog for Version 2.0.0
+
+**Release Date:** [21st Sep 2025]
+
+### New Provider: Claude (Anthropic)
+
+- Added Spectre::Claude client for chat completions using Anthropic Messages API.
+- New configuration block: `Spectre.setup { |c| c.default_llm_provider = :claude; c.claude { |v| v.api_key = ENV['ANTHROPIC_API_KEY'] } }`.
+- Supports `claude: { max_tokens: ... }` in args to control max tokens.
+
+### Structured Outputs via Tools-based JSON Schema
+
+- Claude does not use `response_format`; instead, when `json_schema` is provided we now:
+  - Convert your schema into a single “virtual” tool (`tools[0]`) with `input_schema`.
+  - Force use of that tool by default with `tool_choice: { type: 'tool', name: <schema_name> }` (respects explicit `tool_choice` if you pass one).
+  - Merge your own `tools` alongside the schema tool without overriding them.
+- Messages content preserves structured blocks (hashes/arrays), enabling images and other block types to be sent as-is.
+
+### Output Normalization (Parity with OpenAI when using json_schema)
+
+- When a `json_schema` is provided and Claude returns a single `tool_use` with no text, we normalize the output to:
+  - `content: <parsed_object>` (Hash/Array), not a JSON string.
+  - This mirrors the behavior you get with OpenAI’s JSON schema mode, simplifying consumers.
+- When no `json_schema` is provided, we return `tool_calls` (raw `tool_use` blocks) plus any text content.
+
+### Error Handling & Stop Reasons
+
+- `stop_reason: 'max_tokens'` → raises `"Incomplete response: The completion was cut off due to token limit."`
+- `stop_reason: 'refusal'` → raises `Spectre::Claude::RefusalError`.
+- Unexpected stop reasons raise an error to make issues explicit.
+
+### Tools and tool_choice Support
+
+- Pass-through for user-defined tools.
+- Respect explicit `tool_choice`; only enforce schema tool when `json_schema` is present and no explicit choice is set.
+
+### Tests & DX
+
+- Added a comprehensive RSpec suite for `Spectre::Claude::Completions`.
+- Ensured spec loading works consistently across environments via `.rspec --require spec_helper` and consistent requires.
+- Full suite passes locally (69 examples).
+
+### Notes
+
+- Claude embeddings are not implemented (no native embeddings model).
+- Behavior change (Claude only): when `json_schema` is used, `:content` returns a parsed object (not a JSON string). If you relied on a string, wrap with `JSON.generate` on the caller side.
+
+
+
+# Changelog for Version 2.0.0
+
+**Release Date:** [21st Sep 2025]
+
+### New Provider: Gemini (Google)
+
+- Added Spectre::Gemini client for chat completions using Google’s OpenAI-compatible endpoint.
+- Added Spectre::Gemini embeddings using Google’s OpenAI-compatible endpoint.
+- New configuration block:
+  ```ruby
+  Spectre.setup do |c|
+    c.default_llm_provider = :gemini
+    c.gemini { |v| v.api_key = ENV['GEMINI_API_KEY'] }
+  end
+  ```
+- Supports `gemini: { max_tokens: ... }` in args to control max tokens for completions.
+- `json_schema` and `tools` are passed through in OpenAI-compatible format.
+
+### Core Wiring
+
+- Added `:gemini` to VALID_LLM_PROVIDERS and provider configuration accessors.
+- Updated Rails generator initializer template to include a gemini block.
+
+### Docs & Tests
+
+- Updated README to include Gemini in compatibility matrix and configuration example.
+- Added RSpec tests for Gemini completions and embeddings (mirroring OpenAI behavior and error handling).
+
+### Behavior Notes
+
+- Gemini OpenAI-compatible chat endpoint requires that the last message in `messages` has role 'user'. Spectre raises an ArgumentError if this requirement is not met to prevent 400 INVALID_ARGUMENT errors from the API.
