@@ -200,7 +200,7 @@ Key Benefits:\
 ✅ Improves consistency across OpenAI and Ollama providers.
 
 
-# Changelog for Version 1.3.0
+# Changelog for Version 2.0.0
 
 **Release Date:** [21st Sep 2025]
 
@@ -249,7 +249,7 @@ Key Benefits:\
 
 
 
-# Changelog for Version 1.4.0
+# Changelog for Version 2.0.0
 
 **Release Date:** [21st Sep 2025]
 
