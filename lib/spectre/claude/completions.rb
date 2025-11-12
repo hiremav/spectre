@@ -21,7 +21,7 @@ module Spectre
       # @param json_schema [Hash, nil] Optional JSON Schema; when provided, it will be converted into a tool with input_schema and forced via tool_choice unless overridden
       # @param tools [Array<Hash>, nil] An optional array of tool definitions for function calling
       # @param tool_choice [Hash, nil] Optional tool_choice to force a specific tool use (e.g., { type: 'tool', name: 'record_summary' })
-      # @param args [Hash, nil] optional arguments like read_timeout and open_timeout. For Claude, max_tokens can be passed in the claude hash.
+      # @param args [Hash, nil] optional arguments like read_timeout and open_timeout. Provide max_tokens at the top level only.
       # @return [Hash] The parsed response including any tool calls or content
       # @raise [APIKeyNotConfiguredError] If the API key is not set
       # @raise [RuntimeError] For general API errors or unexpected issues
@@ -43,7 +43,7 @@ module Spectre
           'anthropic-version' => ANTHROPIC_VERSION
         })
 
-        max_tokens = args.dig(:claude, :max_tokens) || 1024
+        max_tokens = args[:max_tokens] || 1024
         request.body = generate_body(messages, model, json_schema, max_tokens, tools, tool_choice).to_json
         response = http.request(request)
 

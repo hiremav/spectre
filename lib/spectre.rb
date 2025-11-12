@@ -7,6 +7,7 @@ require "spectre/openai"
 require "spectre/ollama"
 require "spectre/claude"
 require "spectre/gemini"
+require "spectre/openrouter"
 require "spectre/logging"
 require 'spectre/prompt'
 require 'spectre/errors'
@@ -16,8 +17,8 @@ module Spectre
     openai: Spectre::Openai,
     ollama: Spectre::Ollama,
     claude: Spectre::Claude,
-    gemini: Spectre::Gemini
-    # cohere: Spectre::Cohere,
+    gemini: Spectre::Gemini,
+    openrouter: Spectre::Openrouter
   }.freeze
 
   def self.included(base)
@@ -66,6 +67,11 @@ module Spectre
       yield @providers[:gemini] if block_given?
     end
 
+    def openrouter
+      @providers[:openrouter] ||= OpenrouterConfiguration.new
+      yield @providers[:openrouter] if block_given?
+    end
+
     def provider_configuration
       providers[default_llm_provider] || raise("No configuration found for provider: #{default_llm_provider}")
     end
@@ -85,6 +91,11 @@ module Spectre
 
   class GeminiConfiguration
     attr_accessor :api_key
+  end
+
+  class OpenrouterConfiguration
+    # OpenRouter additionally recommends setting Referer and X-Title headers
+    attr_accessor :api_key, :referer, :app_title
   end
 
   class << self
@@ -118,6 +129,10 @@ module Spectre
 
     def gemini_configuration
       config.providers[:gemini]
+    end
+
+    def openrouter_configuration
+      config.providers[:openrouter]
     end
 
     private

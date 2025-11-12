@@ -194,8 +194,8 @@ RSpec.describe Spectre::Claude::Completions do
             }).to have_been_made.once
         end
 
-        it 'sends the claude max_tokens parameter when provided' do
-          described_class.create(messages: messages, json_schema: json_schema, claude: { max_tokens: 77 })
+        it 'sends the max_tokens parameter when provided' do
+          described_class.create(messages: messages, json_schema: json_schema, max_tokens: 77)
           expect(a_request(:post, Spectre::Claude::Completions::API_URL)
             .with(body: hash_including(max_tokens: 77))).to have_been_made
         end
