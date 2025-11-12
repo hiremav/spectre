@@ -280,3 +280,59 @@ Key Benefits:\
 ### Behavior Notes
 
 - Gemini OpenAI-compatible chat endpoint requires that the last message in `messages` has role 'user'. Spectre raises an ArgumentError if this requirement is not met to prevent 400 INVALID_ARGUMENT errors from the API.
+
+
+# Changelog for Version 2.1.0
+
+**Release Date:** [12th Nov 2025]
+
+### New Provider: OpenRouter
+
+- Added Spectre::Openrouter provider with:
+  - Chat Completions via `https://openrouter.ai/api/v1/chat/completions` (OpenAI-compatible interface).
+  - Embeddings via `https://openrouter.ai/api/v1/embeddings`.
+  - Provider configuration: `Spectre.setup { |c| c.openrouter { |o| o.api_key = ENV['OPENROUTER_API_KEY']; o.referer = 'https://your.app' ; o.app_title = 'Your App' } }`.
+  - Optional headers supported: `HTTP-Referer` and `X-Title` (as recommended by OpenRouter).
+  - Finish reasons handled per OpenRouter docs: `stop`, `tool_calls`/`function_call`, `length`/`model_length`, `content_filter`, `error`.
+  - Refusal handling (raises an error if the model returns a refusal).
+
+### Structured Outputs (json_schema)
+
+- OpenRouter completions support OpenAI-style `response_format: { type: 'json_schema', json_schema: ... }`.
+- Note for schema authors: many OpenRouter-backed providers require a strict schema:
+  - Include a non-empty `required` array listing all keys in `properties`.
+  - Consider `strict: true` and `additionalProperties: false` for best adherence.
+
+### Tests
+
+- Added RSpec tests for `Spectre::Openrouter::Completions` and `Spectre::Openrouter::Embeddings` covering:
+  - Success responses, error propagation, JSON parse errors.
+  - Finish reasons and refusal handling.
+  - Request body formation (max_tokens, tools, response_format.json_schema).
+
+### Breaking Changes
+
+- Unified `max_tokens` option across providers:
+  - Now accepted only as a top-level argument: `... Completions.create(messages: ..., max_tokens: 256)`.
+  - Removed support for provider-scoped forms like `openai: { max_tokens: ... }`, `openrouter: { max_tokens: ... }`, `claude: { max_tokens: ... }`, `gemini: { max_tokens: ... }`.
+
+### Usage Examples
+
+- OpenRouter (completions):
+  ```ruby
+  Spectre.setup do |c|
+    c.default_llm_provider = :openrouter
+    c.openrouter { |o| o.api_key = ENV['OPENROUTER_API_KEY'] }
+  end
+
+  Spectre::Openrouter::Completions.create(
+    messages: [ { role: 'user', content: 'Hello!' } ],
+    model: 'openai/gpt-4o-mini',
+    max_tokens: 256
+  )
+  ```
+
+- OpenRouter (embeddings):
+  ```ruby
+  Spectre::Openrouter::Embeddings.create('some text', model: 'text-embedding-3-small')
+  ```
