@@ -18,7 +18,7 @@ module Spectre
       # @param model [String] The model to be used for generating completions, defaults to DEFAULT_MODEL
       # @param json_schema [Hash, nil] An optional JSON schema to enforce structured output (OpenAI-compatible "response_format")
       # @param tools [Array<Hash>, nil] An optional array of tool definitions for function calling
-      # @param args [Hash, nil] optional arguments like read_timeout and open_timeout. For Gemini, max_tokens can be passed in the gemini hash.
+      # @param args [Hash, nil] optional arguments like read_timeout and open_timeout. Provide max_tokens at the top level only.
       # @return [Hash] The parsed response including any function calls or content
       # @raise [APIKeyNotConfiguredError] If the API key is not set
       # @raise [RuntimeError] For general API errors or unexpected issues
@@ -39,7 +39,7 @@ module Spectre
           'Authorization' => "Bearer #{api_key}"
         })
 
-        max_tokens = args.dig(:gemini, :max_tokens)
+        max_tokens = args[:max_tokens]
         request.body = generate_body(messages, model, json_schema, max_tokens, tools).to_json
         response = http.request(request)
 
