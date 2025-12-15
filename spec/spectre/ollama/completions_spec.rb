@@ -162,5 +162,56 @@ RSpec.describe Spectre::Ollama::Completions do
         }.to raise_error(RuntimeError, /Unexpected finish_reason: unexpected_error/)
       end
     end
+
+    context 'when extra generation options are provided at top-level' do
+      before do
+        stub_request(:post, URI.join(api_host, Spectre::Ollama::Completions::API_PATH))
+          .to_return(status: 200, body: response_body, headers: { 'Content-Type' => 'application/json' })
+      end
+
+      it 'forwards ONLY top-level args into :options and excludes control keys; allows max_tokens to be forwarded' do
+        described_class.create(
+          messages: messages,
+          temperature: 0.1,
+          max_tokens: 999, # should go into options now
+          read_timeout: 2, # should NOT go into options
+          open_timeout: 2 # should NOT go into options
+        )
+
+        expect(a_request(:post, URI.join(api_host, Spectre::Ollama::Completions::API_PATH))
+                 .with { |req|
+                   body = JSON.parse(req.body)
+                   opts = body['options'] || {}
+                   opts['temperature'] == 0.1 &&
+                   !opts.key?('read_timeout') &&
+                   !opts.key?('open_timeout') &&
+                   opts['max_tokens'] == 999
+                 }).to have_been_made.once
+      end
+    end
+
+    context 'when a custom path is provided at top-level' do
+      let(:custom_path) { 'api/custom_chat' }
+
+      before do
+        stub_request(:post, URI.join(api_host, custom_path))
+          .to_return(status: 200, body: response_body, headers: { 'Content-Type' => 'application/json' })
+      end
+
+      it 'uses the provided path and does not forward path into options' do
+        described_class.create(
+          messages: messages,
+          temperature: 0.55,
+          path: custom_path
+        )
+
+        expect(a_request(:post, URI.join(api_host, custom_path))
+                 .with { |req|
+                   body = JSON.parse(req.body)
+                   opts = body['options'] || {}
+                   opts['temperature'] == 0.55 && !opts.key?('path')
+                 }).to have_been_made.once
+      end
+    end
   end
 end

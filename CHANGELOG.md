@@ -308,7 +308,93 @@ Key Benefits:\
 - Added RSpec tests for `Spectre::Openrouter::Completions` and `Spectre::Openrouter::Embeddings` covering:
   - Success responses, error propagation, JSON parse errors.
   - Finish reasons and refusal handling.
+  
+# Changelog for Version 2.1.1
+
+**Release Date:** [15th Dec 2025]
+
+### Enhancements: Extra generation options for Completions
+
+- You can now pass additional generation options (e.g., `temperature`, `top_p`, `presence_penalty`) directly as keyword arguments to all `Completions.create` methods.
+- For OpenAI, OpenRouter, Gemini, and Claude these extra kwargs are forwarded into the request body automatically.
+- For Ollama, pass extra kwargs at the top level just like other providers. Spectre maps them into `body[:options]` internally (including `max_tokens`). The legacy `ollama: { options: ... }` is now ignored.
+
+### Notes and exclusions
+
+- Control/network keys are not forwarded: `read_timeout`, `open_timeout`.
+- `max_tokens` remains supported:
+  - OpenAI/OpenRouter/Gemini/Claude: stays a top‑level request body field.
+  - Ollama: forwarded into `:options` along with other generation kwargs.
+- Claude: `tool_choice` is NOT auto‑forwarded from extra kwargs; pass it explicitly via the dedicated parameter if needed.
+
+### Examples
+
+```ruby
+# OpenAI
+Spectre::Openai::Completions.create(
+  messages: [ { role: 'user', content: 'Hi' } ],
+  model: 'gpt-4o-mini',
+  temperature: 0.1,
+  top_p: 0.9,
+  max_tokens: 512
+)
+
+# OpenRouter
+Spectre::Openrouter::Completions.create(
+  messages: [ { role: 'user', content: 'Hi' } ],
+  model: 'openai/gpt-4o-mini',
+  temperature: 0.1,
+  presence_penalty: 0.2,
+  max_tokens: 256
+)
+
+# Gemini (OpenAI‑compatible endpoint)
+Spectre::Gemini::Completions.create(
+  messages: [ { role: 'user', content: 'Hi' } ],
+  model: 'gemini-2.5-flash',
+  temperature: 0.1,
+  max_tokens: 256
+)
+
+# Claude
+Spectre::Claude::Completions.create(
+  messages: [ { role: 'user', content: 'Hi' } ],
+  model: 'claude-opus-4-1',
+  temperature: 0.1,
+  max_tokens: 512,
+  tool_choice: { type: 'auto' } # pass explicitly when needed
+)
+
+# Ollama — pass options at top level; Spectre maps them to body[:options]
+Spectre::Ollama::Completions.create(
+  messages: [ { role: 'user', content: 'Hi' } ],
+  model: 'llama3.1:8b',
+  temperature: 0.1,
+  max_tokens: 256,   # forwarded into body[:options]
+  path: 'api/chat'   # optional: override endpoint path
+)
+## Note: `ollama: { options: ... }` is ignored; use top-level kwargs instead.
+```
   - Request body formation (max_tokens, tools, response_format.json_schema).
+
+### OpenRouter: Plugins support in chat completions
+
+- Added pass-through support for OpenRouter Plugins in chat completions.
+- You can pass the `plugins` array directly to `Spectre::Openrouter::Completions.create`, and it will be included in the request body.
+
+Example:
+
+```ruby
+Spectre::Openrouter::Completions.create(
+  messages: [ { role: 'user', content: 'Heal my response if needed' } ],
+  model: 'openai/gpt-4o-mini',
+  plugins: [ { id: 'response-healing' } ],
+  temperature: 0.2,
+  max_tokens: 256
+)
+```
+
+Docs: https://openrouter.ai/docs/guides/features/plugins/overview
 
 ### Breaking Changes
 
@@ -336,3 +422,4 @@ Key Benefits:\
   ```ruby
   Spectre::Openrouter::Embeddings.create('some text', model: 'text-embedding-3-small')
   ```
+

@@ -203,5 +203,63 @@ RSpec.describe Spectre::Openrouter::Completions do
         }.to raise_error(RuntimeError, /Refusal: I'm sorry, I cannot assist with that request./)
       end
     end
+
+    context 'when extra generation options are provided' do
+      before do
+        stub_request(:post, Spectre::Openrouter::Completions::API_URL)
+          .to_return(status: 200, body: response_body, headers: { 'Content-Type' => 'application/json' })
+      end
+
+      it 'forwards extra args like temperature/presence_penalty into the body and excludes control keys' do
+        described_class.create(
+          messages: messages,
+          temperature: 0.1,
+          presence_penalty: 0.2,
+          max_tokens: 256,
+          read_timeout: 7,
+          open_timeout: 9
+        )
+
+        expect(a_request(:post, Spectre::Openrouter::Completions::API_URL)
+                 .with { |req|
+                   body = JSON.parse(req.body)
+                   body['temperature'] == 0.1 &&
+                     body['presence_penalty'] == 0.2 &&
+                     body['max_tokens'] == 256 &&
+                     !body.key?('read_timeout') &&
+                     !body.key?('open_timeout')
+                 }).to have_been_made.once
+      end
+    end
+
+    context 'when OpenRouter plugins are provided' do
+      before do
+        stub_request(:post, Spectre::Openrouter::Completions::API_URL)
+          .to_return(status: 200, body: response_body, headers: { 'Content-Type' => 'application/json' })
+      end
+
+      it 'includes plugins array in the request body and still handles other args properly' do
+        described_class.create(
+          messages: messages,
+          model: 'openai/gpt-4o-mini',
+          plugins: [ { id: 'response-healing' } ],
+          temperature: 0.2,
+          max_tokens: 128,
+          read_timeout: 3,
+          open_timeout: 5
+        )
+
+        expect(a_request(:post, Spectre::Openrouter::Completions::API_URL)
+                 .with { |req|
+                   body = JSON.parse(req.body)
+                   body['plugins'].is_a?(Array) &&
+                     body['plugins'].first['id'] == 'response-healing' &&
+                     body['temperature'] == 0.2 &&
+                     body['max_tokens'] == 128 &&
+                     !body.key?('read_timeout') &&
+                     !body.key?('open_timeout')
+                 }).to have_been_made.once
+      end
+    end
   end
 end

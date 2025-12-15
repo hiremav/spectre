@@ -224,6 +224,78 @@ Spectre.provider_module::Completions.create(
 
 ```
 
+#### Passing extra generation options (temperature, top_p, etc.)
+
+You can pass common generation options directly as keyword arguments to `Completions.create`.
+
+- OpenAI/OpenRouter/Gemini/Claude: extra kwargs are forwarded into the request body (e.g., `temperature`, `top_p`, `presence_penalty`).
+- Ollama: pass extra kwargs the same way (top-level). Spectre will put them into `body[:options]` internally (including `max_tokens`). The `ollama: { options: ... }` hash is no longer used.
+- Excluded control keys: `read_timeout`, `open_timeout` are never forwarded.
+- Provider differences for `max_tokens`:
+  - OpenAI/OpenRouter/Gemini/Claude: `max_tokens` is a top‑level field in the request body.
+  - Ollama: `max_tokens` is forwarded into `body[:options]`.
+- Claude: `tool_choice` is not auto‑forwarded; provide it explicitly via the `tool_choice:` parameter when needed.
+
+Examples:
+
+```ruby
+# OpenAI
+Spectre::Openai::Completions.create(
+  messages: [ { role: 'user', content: 'Hi' } ],
+  model: 'gpt-4o-mini',
+  temperature: 0.1,
+  top_p: 0.9,
+  max_tokens: 512
+)
+
+# OpenRouter
+Spectre::Openrouter::Completions.create(
+  messages: [ { role: 'user', content: 'Hi' } ],
+  model: 'openai/gpt-4o-mini',
+  temperature: 0.1,
+  presence_penalty: 0.2,
+  max_tokens: 256
+)
+
+# OpenRouter with Plugins
+# Docs: https://openrouter.ai/docs/guides/features/plugins/overview
+Spectre::Openrouter::Completions.create(
+  messages: [ { role: 'user', content: 'Heal my response if needed' } ],
+  model: 'openai/gpt-4o-mini',
+  plugins: [ { id: 'response-healing' } ],
+  temperature: 0.2,
+  max_tokens: 256
+)
+
+# Gemini (OpenAI‑compatible endpoint)
+Spectre::Gemini::Completions.create(
+  messages: [ { role: 'user', content: 'Hi' } ],
+  model: 'gemini-2.5-flash',
+  temperature: 0.1,
+  max_tokens: 256
+)
+
+# Claude
+Spectre::Claude::Completions.create(
+  messages: [ { role: 'user', content: 'Hi' } ],
+  model: 'claude-opus-4-1',
+  temperature: 0.1,
+  max_tokens: 512,
+  tool_choice: { type: 'auto' } # pass explicitly when needed
+)
+
+# Ollama — pass options at top level (Spectre maps them to body[:options])
+Spectre::Ollama::Completions.create(
+  messages: [ { role: 'user', content: 'Hi' } ],
+  model: 'llama3.1:8b',
+  temperature: 0.1,      # forwarded into body[:options]
+  max_tokens: 256,       # forwarded into body[:options]
+  path: 'api/chat'       # optional: override endpoint path
+)
+
+# Note: `ollama: { options: ... }` is ignored; use top-level kwargs instead.
+```
+
 **Using a JSON Schema for Structured Output**
 
 For cases where you need structured output (e.g., for returning specific fields or formatted responses), you can pass a `json_schema` parameter. The schema ensures that the completion conforms to a predefined structure:
