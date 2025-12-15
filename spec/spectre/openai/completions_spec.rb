@@ -173,5 +173,33 @@ RSpec.describe Spectre::Openai::Completions do
         }.to raise_error(RuntimeError, /Refusal: I'm sorry, I cannot assist with that request./)
       end
     end
+
+    context 'when extra generation options are provided' do
+      before do
+        stub_request(:post, Spectre::Openai::Completions::API_URL)
+          .to_return(status: 200, body: response_body, headers: { 'Content-Type' => 'application/json' })
+      end
+
+      it 'forwards extra args like temperature/top_p into the body and excludes control keys' do
+        described_class.create(
+          messages: messages,
+          temperature: 0.1,
+          top_p: 0.9,
+          max_tokens: 128,
+          read_timeout: 5,
+          open_timeout: 5
+        )
+
+        expect(a_request(:post, Spectre::Openai::Completions::API_URL)
+                 .with { |req|
+                   body = JSON.parse(req.body)
+                   body['temperature'] == 0.1 &&
+                     body['top_p'] == 0.9 &&
+                     body['max_tokens'] == 128 &&
+                     !body.key?('read_timeout') &&
+                     !body.key?('open_timeout')
+                 }).to have_been_made.once
+      end
+    end
   end
 end

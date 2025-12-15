@@ -17,9 +17,9 @@ module Spectre
       # @param model [String] The model to be used for generating completions, defaults to DEFAULT_MODEL
       # @param json_schema [Hash, nil] An optional JSON schema to enforce structured output
       # @param tools [Array<Hash>, nil] An optional array of tool definitions for function calling
-      # @param args [Hash, nil] optional arguments like read_timeout and open_timeout. You can pass in the ollama hash to specify the path and options.
-      # @param args.ollama.path [String, nil] The path to the Ollama API endpoint, defaults to API_PATH
-      # @param args.ollama.options [Hash, nil] Additional model parameters listed in the documentation for the https://github.com/ollama/ollama/blob/main/docs/modelfile.md#valid-parameters-and-values such as temperature
+      # @param args [Hash, nil] optional arguments like read_timeout and open_timeout.
+      #   Any additional top-level kwargs (e.g., temperature:, max_tokens:) will be forwarded into body[:options], same as other providers forward into body.
+      # @param path [String, nil] Top-level path override for the Ollama API endpoint, defaults to API_PATH
       # @return [Hash] The parsed response including any function calls or content
       # @raise [HostNotConfiguredError] If the API host is not set in the provider configuration.
       # @raise [APIKeyNotConfiguredError] If the API key is not set
@@ -32,7 +32,7 @@ module Spectre
 
         validate_messages!(messages)
 
-        path = args.dig(:ollama, :path) || API_PATH
+        path = args[:path] || API_PATH
         uri = URI.join(api_host, path)
         http = Net::HTTP.new(uri.host, uri.port)
         http.use_ssl = true if uri.scheme == 'https'
@@ -44,7 +44,13 @@ module Spectre
           'Authorization' => "Bearer #{api_key}"
         })
 
-        options = args.dig(:ollama, :options)
+        # Forward extra top-level args (like temperature, max_tokens) into body[:options],
+        # excluding control/network keys and the request path override.
+        forwarded = args.reject { |k, _| [:read_timeout, :open_timeout, :path].include?(k) }
+        options = nil
+        if forwarded && !forwarded.empty?
+          options = forwarded.transform_keys(&:to_sym)
+        end
         request.body = generate_body(messages, model, json_schema, tools, options).to_json
         response = http.request(request)
 

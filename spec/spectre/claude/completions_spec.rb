@@ -223,5 +223,45 @@ RSpec.describe Spectre::Claude::Completions do
         end
       end
     end
+
+    context 'when extra generation options are provided' do
+      before do
+        stub_request(:post, Spectre::Claude::Completions::API_URL)
+          .to_return(status: 200, body: success_response_body, headers: { 'Content-Type' => 'application/json' })
+      end
+
+      it 'forwards extra args like temperature/top_p into the body and excludes control keys' do
+        described_class.create(
+          messages: messages,
+          temperature: 0.3,
+          top_p: 0.7,
+          max_tokens: 128,
+          read_timeout: 3,
+          open_timeout: 5
+        )
+
+        expect(a_request(:post, Spectre::Claude::Completions::API_URL)
+                 .with { |req|
+                   body = JSON.parse(req.body)
+                   body['temperature'] == 0.3 &&
+                     body['top_p'] == 0.7 &&
+                     body['max_tokens'] == 128 &&
+                     !body.key?('read_timeout') &&
+                     !body.key?('open_timeout')
+                 }).to have_been_made.once
+      end
+
+      it 'includes tool_choice only when explicitly provided' do
+        # Without tool_choice
+        described_class.create(messages: messages, temperature: 0.2)
+        expect(a_request(:post, Spectre::Claude::Completions::API_URL)
+                 .with { |req| !JSON.parse(req.body).key?('tool_choice') }).to have_been_made
+
+        # With explicit tool_choice
+        described_class.create(messages: messages, temperature: 0.2, tool_choice: { type: 'auto' })
+        expect(a_request(:post, Spectre::Claude::Completions::API_URL)
+                 .with { |req| JSON.parse(req.body)['tool_choice'] == { 'type' => 'auto' } }).to have_been_made
+      end
+    end
   end
 end

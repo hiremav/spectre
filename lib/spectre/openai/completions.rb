@@ -18,6 +18,7 @@ module Spectre
       # @param json_schema [Hash, nil] An optional JSON schema to enforce structured output
       # @param tools [Array<Hash>, nil] An optional array of tool definitions for function calling
       # @param args [Hash, nil] optional arguments like read_timeout and open_timeout. Provide max_tokens at the top level only.
+      #   Any additional kwargs (e.g., temperature:, top_p:) will be forwarded into the request body.
       # @return [Hash] The parsed response including any function calls or content
       # @raise [APIKeyNotConfiguredError] If the API key is not set
       # @raise [RuntimeError] For general API errors or unexpected issues
@@ -39,7 +40,9 @@ module Spectre
         })
 
         max_tokens = args[:max_tokens]
-        request.body = generate_body(messages, model, json_schema, max_tokens, tools).to_json
+        # Forward extra args (like temperature) into the body, excluding control/network keys
+        forwarded = args.reject { |k, _| [:read_timeout, :open_timeout, :max_tokens].include?(k) }
+        request.body = generate_body(messages, model, json_schema, max_tokens, tools, forwarded).to_json
         response = http.request(request)
 
         unless response.is_a?(Net::HTTPSuccess)
@@ -82,7 +85,7 @@ module Spectre
       # @param max_tokens [Integer, nil] The maximum number of tokens for the completion
       # @param tools [Array<Hash>, nil] An optional array of tool definitions for function calling
       # @return [Hash] The body for the API request
-      def self.generate_body(messages, model, json_schema, max_tokens, tools)
+      def self.generate_body(messages, model, json_schema, max_tokens, tools, forwarded)
         body = {
           model: model,
           messages: messages
@@ -91,6 +94,11 @@ module Spectre
         body[:max_tokens] = max_tokens if max_tokens
         body[:response_format] = { type: 'json_schema', json_schema: json_schema } if json_schema
         body[:tools] = tools if tools # Add the tools to the request body if provided
+
+        # Merge any extra forwarded options (e.g., temperature, top_p)
+        if forwarded && !forwarded.empty?
+          body.merge!(forwarded.transform_keys(&:to_sym))
+        end
 
         body
       end

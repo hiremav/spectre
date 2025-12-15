@@ -188,5 +188,33 @@ RSpec.describe Spectre::Gemini::Completions do
         }.to raise_error(ArgumentError, /Gemini: the last message must have role 'user'/)
       end
     end
+
+    context 'when extra generation options are provided' do
+      before do
+        stub_request(:post, Spectre::Gemini::Completions::API_URL)
+          .to_return(status: 200, body: response_body, headers: { 'Content-Type' => 'application/json' })
+      end
+
+      it 'forwards extra args like temperature/top_p into the body and excludes control keys' do
+        described_class.create(
+          messages: [ { role: 'system', content: 'sys' }, { role: 'user', content: 'hi' } ],
+          temperature: 0.2,
+          top_p: 0.8,
+          max_tokens: 64,
+          read_timeout: 4,
+          open_timeout: 6
+        )
+
+        expect(a_request(:post, Spectre::Gemini::Completions::API_URL)
+                 .with { |req|
+                   body = JSON.parse(req.body)
+                   body['temperature'] == 0.2 &&
+                     body['top_p'] == 0.8 &&
+                     body['max_tokens'] == 64 &&
+                     !body.key?('read_timeout') &&
+                     !body.key?('open_timeout')
+                 }).to have_been_made.once
+      end
+    end
   end
 end
