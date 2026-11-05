@@ -91,6 +91,16 @@ RSpec.describe Spectre::Prompt do
       end
     end
 
+    context 'when locals contain control characters' do
+      let(:template) { 'rag/user' }
+      let(:locals) { { query: "CHÃ\u0081VEZ\u0000", objects: ["Line\u0007one\nLine\ttwo"] } }
+
+      it 'drops them and keeps newlines and tabs' do
+        expected_result = "User's query: CHÃVEZ\nContext: Lineone\nLine\ttwo\n"
+        expect(subject).to eq(expected_result)
+      end
+    end
+
     context 'when the prompt file is not found' do
       let(:template) { 'nonexistent_template' }
 
