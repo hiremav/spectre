@@ -432,3 +432,13 @@ Docs: https://openrouter.ai/docs/guides/features/plugins/overview
 
 - `Spectre::Prompt.render` now drops control characters (e.g. `\u0000`, `\u0081`) from string locals before rendering. YAML rejects them, so a single bad character in a local used to fail the whole render with `YAML Syntax Error ... control characters are not allowed`.
 - Newlines and tabs are kept, as before.
+
+# Changelog for Version 2.1.3
+
+**Release Date:** [5th Nov 2026]
+
+### Ruby 4 support
+
+- Spectre now works on Ruby 4.0. Development and CI use Ruby 4.0.9.
+- `logger` is now a runtime dependency. Ruby 4.0 no longer ships it as a default gem, and Spectre requires it for logging.
+- `required_ruby_version` is unchanged (`>= 3`).
