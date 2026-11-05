@@ -116,12 +116,16 @@ module Spectre
         end
       end
 
+      # Control characters YAML rejects; newlines and tabs are escaped below instead.
+      CONTROL_CHARS = /[^\P{Cc}\n\r\t]/
+
       # Escape special characters in strings to avoid YAML parsing issues
       #
       # @param value [String] The string to process
       # @return [String] The processed string with special characters escaped
       def escape_special_chars(value)
-        value.gsub('&', '&amp;')
+        value.gsub(CONTROL_CHARS, '')
+             .gsub('&', '&amp;')
              .gsub('<', '&lt;')
              .gsub('>', '&gt;')
              .gsub('"', '&quot;')

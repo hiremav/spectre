@@ -423,3 +423,12 @@ Docs: https://openrouter.ai/docs/guides/features/plugins/overview
   Spectre::Openrouter::Embeddings.create('some text', model: 'text-embedding-3-small')
   ```
 
+
+# Changelog for Version 2.1.2
+
+**Release Date:** [5th Nov 2026]
+
+### Fix: Control characters in prompt locals
+
+- `Spectre::Prompt.render` now drops control characters (e.g. `\u0000`, `\u0081`) from string locals before rendering. YAML rejects them, so a single bad character in a local used to fail the whole render with `YAML Syntax Error ... control characters are not allowed`.
+- Newlines and tabs are kept, as before.
