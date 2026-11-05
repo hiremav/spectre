@@ -2,6 +2,7 @@ PATH
   remote: .
   specs:
     spectre_ai (2.1.2)
+      logger
 
 GEM
   remote: https://rubygems.org/
@@ -54,19 +55,24 @@ GEM
     irb (1.14.0)
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
+    logger (1.7.0)
     loofah (2.22.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
     method_source (1.1.0)
-    minitest (5.25.1)
+    minitest (6.0.6)
+      drb (~> 2.0)
+      prism (~> 1.5)
     mutex_m (0.2.0)
-    nokogiri (1.16.7-arm64-darwin)
+    nokogiri (1.19.7-arm64-darwin)
       racc (~> 1.4)
-    nokogiri (1.16.7-x86_64-linux)
+    nokogiri (1.19.7-x86_64-linux-gnu)
       racc (~> 1.4)
-    pry (0.14.2)
+    prism (1.9.0)
+    pry (0.16.1)
       coderay (~> 1.1)
       method_source (~> 1.0)
+      reline (>= 0.6.0)
     psych (5.1.2)
       stringio
     public_suffix (6.0.1)
@@ -97,7 +103,7 @@ GEM
     rake (13.2.1)
     rdoc (6.7.0)
       psych (>= 4.0.0)
-    reline (0.5.9)
+    reline (0.7.0)
       io-console (~> 0.5)
     rexml (3.3.6)
       strscan
@@ -141,4 +147,4 @@ DEPENDENCIES
   webmock
 
 BUNDLED WITH
-   2.5.11
+   2.6.7

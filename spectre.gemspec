@@ -14,6 +14,8 @@ Gem::Specification.new do |s|
 
   s.files = Dir.glob("lib/**/*") + %w[README.md CHANGELOG.md]
   s.require_paths = ["lib"]
+  s.add_dependency 'logger'
+
   # Development dependencies
   s.add_development_dependency 'rspec-rails'
   s.add_development_dependency 'pry'
